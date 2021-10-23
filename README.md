@@ -3,9 +3,6 @@
 [Скрины](https://photos.app.goo.gl/9E5B8Mnn3d51z8Vu6)
 
 
-
-
-
 ***Задание №2***
 
 В соответствии с жизненным циклом разработки программного обеспечения
@@ -21,3 +18,8 @@
 8. Мониторинг приложения на проде. При возникновении ошибок, откатываемся на предыдущий рабочий релиз
 9. На случай если 6-ой этап завершается с ошибкой возвращаемся к 3-му пункту
 10. Также к моменту QA-тестов необходимо отладить систему автоматической рассылки результатов ответственным людям.
+
+
+![md](https://lh3.googleusercontent.com/pw/AM-JKLXcnQr5gHKGExwgBJCfbXASz6G_yQhWvTkExWeEzKFtVUHTXqmZwZDro--hTfHLZ0xgTOCXYgtihvb76ROO1HVvf5-NY0fEptoAd7d4G82KGOg9iJK8meQQKTdJqYJHnW6peeZ9iKX05cgG2VrIDseQvA=w1133-h637-no?authuser=0)
+
+![Terraform](https://lh3.googleusercontent.com/pw/AM-JKLWM3kIlnoza06pVRFjFcc15zg2yAyBD9jgMMIog_0bseahZFyoTv80emzbJMFb91IYTdxD_BJFRgGz2aigYXw1racyzJvek7izB-jpgcx6ARrXX1X7V1yz3ocDiEES_kCeYj5s5fLv_Et2HGKY2g_Nfkg=w1133-h637-no?authuser=0)
