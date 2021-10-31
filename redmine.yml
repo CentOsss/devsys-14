@@ -1,0 +1,73 @@
+version: '3.1'
+
+services:
+
+  mysql:
+    image: mysql:5.7.32
+    container_name: mysql
+    volumes:
+      - /sharedock/mysql/:/var/lib/mysql/
+    ports:
+      - 3306:3306
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 
+      MYSQL_DATABASE: 
+      MYSQL_USER: 
+      MYSQL_PASSWORD: 
+
+
+  redmine:
+    image: nordit/redmine:1
+    container_name: redmine
+    volumes:
+      - /sharedock/redmine/app_volume/:/usr/src/redmine/
+      - /sharedock/:/sharedock/
+      - /sharedock/redmine/files/:/usr/src/redmine/files/
+    restart: always
+    environment:
+      REDMINE_DB_MYSQL: 
+      REDMINE_DB_USERNAME: 
+      REDMINE_DB_PASSWORD: 
+    ports:
+      - 80:3000
+  
+  oxidized:
+    image: oxidized/oxidized:latest
+    container_name: oxidized
+    ports:
+      - 4444:8888
+    volumes:
+      - /sharedock/oxidized/:/root/.config/oxidized/
+    restart: always
+
+
+#  redis:
+#    image: redis:latest
+#    container_name: redis
+#    restart: always
+#    command:
+#    - redis-server
+#    - --save 900 1
+#    volumes:
+#    - /sharedock/redis/data:/data
+#    ports:
+#      - 6379:6379
+
+
+
+## DB for redmine
+## edit /redmine/app_volume/config/database.yml for connect redmine with it instance
+
+#database.yml
+  #production:
+  #  adapter: mysql2
+  #  host: 172.16.13.5  change IP-address to host with DB
+
+# edit permision on DIR
+# chown -f 999:docker tmp
+
+#After deploy container download DB dump
+# docker exec -it <CONTAINER_ID> bash
+# mysql -u root -p redmine < dump.sql
+
