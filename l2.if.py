@@ -13,28 +13,38 @@
 # import re
 # import sys
 
-if __name__ == '__main__':
-    n = int(input().strip())
-    if n % 2 > 0:
-        print('Weird')
-    elif 5 >= n >= 2:
-        print('Not Weird')
-    elif 20 >= n >= 6:
-        print('Weird')
-    else:
-        print('Not Weird')
-
-# height = int(input('Input height'))
-# age = int(input('Input your age'))
-#
-# if 18 < age < 27:
-#     if height < 170:
-#         print("Tank Army")
-#     elif height < 185:
-#         print("Flot Army")
-#     elif height < 200:
-#         print("Desant Army")
+# if __name__ == '__main__':
+#     n = int(input().strip())
+#     if n % 2 > 0:
+#         print('Weird')
+#     elif 5 >= n >= 2:
+#         print('Not Weird')
+#     elif 20 >= n >= 6:
+#         print('Weird')
 #     else:
-#         print("Other")
-# else:
-#     print("Don't army")
+#         print('Not Weird')
+
+# Задача №2
+# На лекции мы рассматривали пример для военкомата.
+# Сейчас мы знаем про его рост. Расширить это приложение следующими условиями:
+# Проверка на возраст призывника.
+# Количество детей.
+# Учится ли он сейчас.
+
+age = int(input('Input your age'))
+childs = int(input('How many kids do you have?'))
+height = int(input('Input height'))
+student = input('Are you a student?')
+
+
+if 18 <= age < 27 and childs <= 2 and student != 'yes':
+    if height < 170:
+        print("Tank Army")
+    elif height < 185:
+        print("Flot Army")
+    elif height < 200:
+        print("Desant Army")
+    else:
+        print("Other")
+else:
+    print("Don't army")
