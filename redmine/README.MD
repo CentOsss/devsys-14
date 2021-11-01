@@ -3,7 +3,7 @@
 <p>Директория приложения и все необходимы файлы находится на файловой системе хост-машины по пути /sharedock/*. <a href="/projects/retail2/wiki/Резервное_копировани_и_восстановление">Резервные копии</a> хранятся на сервер nasn44 (192.168.204.5) по пути&nbsp;admin@192.168.204.5:/share/CACHEDEV1_DATA/backup/redmine_stack или \\192.168.204.5\backup&nbsp;</p>
 
 <div style="background: rgb(238, 238, 238); border: 1px solid rgb(204, 204, 204); padding: 5px 10px; margin-left: 40px;">
-<p>&nbsp; &nbsp; В качестве&nbsp;ITSM используется веб-приложение Redmine в связке с Oxidized. и GIT.&nbsp;&nbsp;Сервис развернут на виртуальном хосте help.conslate.ru 192.168.204.4.<br />
+<p>&nbsp; &nbsp; В качестве&nbsp;ITSM используется веб-приложение Redmine в связке с Oxidized. и GIT.&nbsp;&nbsp;Сервис развернут на виртуальном хосте 192.168.204.4.<br />
 Представляет собой стэк микросервисов на базе docker-контейнеризации.</p>
 
 <p>Состоит из 4&nbsp;контейнеров - базы&nbsp;данных mysql, веб-приложения&nbsp;redmine, системы управления конфигурациями сетевого оборуования oxidiized, системы&nbsp;контроля версий GIT и реверсивного&nbsp;прокси сервера nginx.<br />
@@ -29,9 +29,9 @@ services:
 &nbsp; &nbsp; restart: always
 &nbsp; &nbsp; environment:
 &nbsp; &nbsp; &nbsp; MYSQL_ROOT_PASSWORD: 
-&nbsp; &nbsp; &nbsp; MYSQL_DATABASE: redmine
-&nbsp; &nbsp; &nbsp; MYSQL_USER: redmine
-&nbsp; &nbsp; &nbsp; MYSQL_PASSWORD: redmine
+&nbsp; &nbsp; &nbsp; MYSQL_DATABASE: 
+&nbsp; &nbsp; &nbsp; MYSQL_USER: 
+&nbsp; &nbsp; &nbsp; MYSQL_PASSWORD: 
 
 &nbsp; redmine:
 &nbsp; &nbsp; image: nordit/redmine:1
@@ -42,9 +42,9 @@ services:
 &nbsp; &nbsp; &nbsp; - /sharedock/redmine/files:/usr/src/redmine/files/
 &nbsp; &nbsp; restart: always
 &nbsp; &nbsp; environment:
-&nbsp; &nbsp; &nbsp; REDMINE_DB_MYSQL: redmine
-&nbsp; &nbsp; &nbsp; REDMINE_DB_USERNAME: redmine
-&nbsp; &nbsp; &nbsp; REDMINE_DB_PASSWORD: redmine
+&nbsp; &nbsp; &nbsp; REDMINE_DB_MYSQL: 
+&nbsp; &nbsp; &nbsp; REDMINE_DB_USERNAME: 
+&nbsp; &nbsp; &nbsp; REDMINE_DB_PASSWORD: 
 &nbsp; &nbsp; ports:
 &nbsp; &nbsp; &nbsp; - 80:3000
 
@@ -65,7 +65,7 @@ services:
 docker-compose -f redmine.yml up -d </em>
 </pre>
 
-<p>&nbsp; &nbsp; После поднятия сервиса необходимо загрузить актуальный дамп базы. (дампы есть в архиве&nbsp;sharedock.tgz по пути /sharedock/mysql/databases.sql)</p>
+<p>&nbsp; &nbsp; После поднятия сервиса необходимо загрузить актуальный дамп базы. </p>
 
 <pre>
 # docker exec -it ID_CONTAINER bash
