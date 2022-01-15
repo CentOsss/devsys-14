@@ -1,0 +1,22 @@
+      wget https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz
+  977  tar xvfz node_exporter-1.3.1.linux-amd64.tar.gz
+  978  cd node_exporter-1.3.1.linux-amd64/
+  979  ./node_exporter
+  980  systemctl stop node_exporter.service
+  981  systemctl status node_exporter.service
+  982  systemctl cat node_exporter.service
+  983  nano /etc/systemd/system/node_exporter.service
+  984  yum remove node_exporter
+  985  nano /etc/systemd/system/node_exporter.service
+  986  ls
+  987  pwd
+  988  mv node_exporter /usr/sbin/
+  989  ls /usr/sbin/node_exporter
+  990  nano /etc/systemd/system/node_exporter.service
+  991  systemctl reload
+  992  systemctl daemon-re
+  993  systemctl daemon-reload
+  994  systemctl -l -t service
+  995  systemctl start node_exporter.service
+  996  systemctl status node_exporter.service
+
