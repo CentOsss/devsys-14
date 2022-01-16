@@ -23,6 +23,9 @@ WantedBy=multi-user.target
 # Перечитываем конфиги, запускаем и включаем Unit
   
 systemctl daemon-reload
-systemctl start node_exporter.service
-systemctl status node_exporter.service
 systemctl enable --now node_exporter.service
+
+# Сервис запустился, метрики доступны. 
+# Проверены режимы останова сервиса и запуска. 
+# После перезагрузки модуль не стартовал с 200ой EXEC ошибкой. Без отклбчения SeLinux на OraclLinux8 добиться запуска юнита так и не смог. Предпологаяю, что необходимо по другому описывать раздел [Install] если на сервере планируется использование SeLinux/
+# С отключенныйм SeLinux созданный модуль node_exporter прекрасно стартует. 
