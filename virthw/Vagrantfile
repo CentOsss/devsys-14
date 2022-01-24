@@ -2,7 +2,7 @@ ISO = "bento/ubuntu-20.04"
 NET = "192.168.192."
 DOMAIN = ".netology"
 HOST_PREFIX = "server"
-INVENTORY_PATH = "../ansible/inventory"
+INVENTORY_PATH = "/etc/ansible/inventory"
 servers = [
  {
  :hostname => HOST_PREFIX + "1" + DOMAIN,
@@ -29,6 +29,13 @@ host: machine[:ssh_host]
  vb.customize ["modifyvm", :id, "--cpus", machine[:core]]
  vb.name = machine[:hostname]
  end
+ node.vm.provision "ansible" do |setup|
+ setup.inventory_path = INVENTORY_PATH
+ setup.playbook = "/etc/ansible/provision.yml"
+ setup.become = true
+ setup.extra_vars = { ansible_user: 'vagrant' }
+ end
  end
  end
 end
+
