@@ -31,20 +31,25 @@
 # Количество детей.
 # Учится ли он сейчас.
 
-age = int(input('Input your age'))
-childs = int(input('How many kids do you have?'))
-height = int(input('Input height'))
-student = input('Are you a student?')
+# age = int(input('Input your age'))
+# childs = int(input('How many kids do you have?'))
+# height = int(input('Input height'))
+# student = input('Are you a student?')
+#
+#
+# if 18 <= age < 27 and childs <= 2 and student != 'yes':
+#     if height < 170:
+#         print("Tank Army")
+#     elif height < 185:
+#         print("Flot Army")
+#     elif height < 200:
+#         print("Desant Army")
+#     else:
+#         print("Other")
+# else:
+#     print("Don't army")
 
-
-if 18 <= age < 27 and childs <= 2 and student != 'yes':
-    if height < 170:
-        print("Tank Army")
-    elif height < 185:
-        print("Flot Army")
-    elif height < 200:
-        print("Desant Army")
-    else:
-        print("Other")
-else:
-    print("Don't army")
+i = 1
+for color in 'red', 'orange', 'yellow', 'green', 'cyan', 'blue', 'violet':
+    print(i, '-th color of rainbow is ', color, sep = '')
+    i += 1
