@@ -1,0 +1,36 @@
+Vagrant.configure("2") do |config|
+  config.vm.provider :hyperv do |hv|
+  config.vm.box = "bento/ubuntu-20.04"
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.synced_folder "src/", "/srv/website", disabled: true
+  config.vagrant.plugins = "vagrant-docker-compose"
+  config.vm.provision :docker
+  config.vm.provision :docker_compose
+    hv.vmname = "vm-ubuntu"
+    hv.cpus = 4
+    hv.memory = 4096
+    hv.enable_checkpoints = true
+    hv.linked_clone = true
+    hv.auto_start_action = "StartIfRunning"
+    hv.auto_stop_action = "Save"
+  end
+  config.vm.provision "shell", inline: <<-SHELL
+    echo "Europe/Moscow" > /etc/timezone
+    ln -fs /usr/share/zoneinfo/Europe/Moscow /etc/localtime
+    apt-get update
+    apt-get install -y ssh sudo
+    useradd -m -s /bin/bash itadmin
+    echo 'itadmin:password' | chpasswd
+    #adduser onetrix sudo
+    echo 'itadmin   ALL=NOPASSWD: ALL' >> /etc/sudoers
+    curl -fsSL https://get.docker.com -o get-docker.sh
+    sudo sh get-docker.sh
+    # setup jenkins-debian-glue
+    #wget https://raw.github.com/mika/jenkins-debian-glue/master/puppet/apply.sh
+    #sudo bash ./apply.sh changemenow
+    # add custom user
+    # echo 'jenkins.model.Jenkins.instance.securityRealm.createAccount("newuser", "newpassword")' | sudo java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s "http://localhost:8080" -auth jenkins-debian-glue:changemenow -noKeyAuth groovy =
+    # access http://<ip-of-vm>:8080
+  SHELL
+end
+
