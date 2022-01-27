@@ -1,0 +1,51 @@
+---
+username: 
+password: 
+model: routeros
+resolve_dns: false
+interval: 3600
+use_syslog: false
+debug: false
+threads: 30
+timeout: 20
+retries: 3
+prompt: !ruby/regexp /^([\w.@-]+[#>]\s?)$/
+rest: 0.0.0.0:8888
+next_adds_job: false
+vars: 
+  remove_secret: true
+groups: {}
+models: {}
+verify_host_key: never
+pid: "/root/.config/oxidized/pid"
+crash:
+  directory: "/root/.config/oxidized/crashes"
+  hostnames: false
+stats:
+  history_size: 10
+input:
+  default: ssh, telnet
+  debug: false
+  ssh:
+    secure: false
+  ftp:
+    passive: true
+  utf8_encoded: true
+output:
+  default: git
+  git:
+    user: oxidized
+    email: it@hollywood.ru
+    repo: "/root/.config/oxidized/devices.git"
+source:
+  default: csv
+  csv:
+    file: "/root/.config/oxidized/router.db"
+    delimiter: !ruby/regexp /:/
+    map:
+      name: 0
+      ip: 1
+    gpg: false
+model_map:
+  cisco: ios
+  juniper: junos

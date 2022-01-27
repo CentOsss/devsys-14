@@ -1,0 +1,62 @@
+dnf install glibc-langpack-ru
+localectl set-locale LANG=ru_RU.utf8
+setenforce 0; nano /etc/selinux/config  #set SELINUX=permissive
+
+systemctl stop firewalld
+systemctl disable firewalld
+nano /etc/hostname #set hostname
+
+nano /etc/ssh/sshd.conf #set CLienAllive disable
+
+rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+yum install htop
+ 
+
+hdparm -Tt /dev/mapper/ol-root # test disk
+
+rpm -i https://repo.postgrespro.ru/pgpro-12/keys/oraclelinux.rpm
+yum makecache
+yum install postgrespro-std-12-contrib
+/opt/pgpro/std-12/bin/pg-setup initdb --locale=ru_RU.UTF8 --tune=1c
+/opt/pgpro/std-12/bin/pg-setup service enable
+/opt/pgpro/std-12/bin/pg-setup service start
+systemctl restart postgrespro-std-12.service
+
+echo "PATH=/usr/bin/:/opt/pgpro/std-12/bin" >> /etc/environment  # declare ENV PATH for user postgres
+
+su - postgres
+
+psql
+
+\password
+
+postgres=# show config_file; postgres=# show hba_file;
+
+В первом файле нужно изменить (или добавить) параметр с необходимым значением, наподобие:
+
+    listen_addresses = '*'
+
+Во втором файле - наподобие:
+
+ host    all    all    192.168.204.0/24    md5
+
+host    all    all    192.168.204.0/24    md5
+
+pg_restore -f *.dump
+
+https://infostart.ru/1c/articles/805266/
+
+yum install 1c-enterprise-8.3.19.1150-common-8.3.19-1150.x86_64.rpm
+yum install 1c-enterprise-8.3.19.1150-server-8.3.19-1150.x86_64.rpm
+yum install fontconfig freetype libgsf unixODBC
+ln -s /opt/1cv8/x86_64/8.3.19.1150/srv1cv83 /etc/init.d/srv1cv83
+/lib/systemd/systemd-sysv-install enable srv1cv83
+systemctl status srv1cv83
+
+cd /opt/1cv8/x86_64/8.3.19.1150/
+./ras --daemon cluster
+./ras cluster list
+./rac cluster list
+./rac infobase --cluster=32129bc6-dea7-4e77-9206-b7ec9a62b8af summary list
+./rac cluster admin --cluster=32129bc6-dea7-4e77-9206-b7ec9a62b8af register --name=admin --pwd=Lbvtnhf7373 --auth=pwd
+./rac infobase create --cluster=32129bc6-dea7-4e77-9206-b7ec9a62b8af --create-database --name=demo --descr=MyTestBaseOnLinuxPower --dbms=PostgreSQL --db-server=localhost --db-name=demo --locale=ru --db-user=postgres --db-pwd=Lbvtnhf7373 --cluster-user=admin --cluster-pwd=Lbvtnhf7373 --license-distribution=allow

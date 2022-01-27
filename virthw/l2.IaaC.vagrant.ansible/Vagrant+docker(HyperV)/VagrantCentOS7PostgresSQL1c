@@ -1,0 +1,38 @@
+Vagrant.configure("2") do |config| 
+  config.vm.provider :hyperv do |hv|
+  config.vm.box = "centos/7"
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.synced_folder "src/", "/srv/website", disabled: true
+    hv.vmname = "vm-postgresql_1c"
+    hv.cpus = 4
+    hv.memory = 4096
+    hv.enable_checkpoints = true
+    hv.linked_clone = true
+    hv.auto_start_action = "StartIfRunning"
+    hv.auto_stop_action = "Save"
+  end
+  config.vm.provision "shell", inline: <<-SHELL
+    echo "Europe/Moscow" > /etc/timezone
+    echo "PATH=/usr/bin/:/opt/pgpro/1c-14/bin/" >> /etc/environment
+    ln -fs /usr/share/zoneinfo/Europe/Moscow /etc/localtime
+    echo "1csrv03.nord.ru" > /etc/hostname
+    setenforce 0
+    systemctl stop firewalld
+    systemctl disable firewalld
+    yum update
+    yum install -y ssh sudo
+    useradd -m -s /bin/bash itadmin
+    echo 'itadmin:Lbvtnhf7373' | chpasswd
+    #adduser onetrix sudo
+    echo 'itadmin   ALL=NOPASSWD: ALL' >> /etc/sudoers
+    sudo localedef -i ru_RU -f UTF-8 ru_RU.UTF-8
+    sudo localectl set-locale LANG=ru_RU.utf8
+    rpm -i https://repo.postgrespro.ru/pg1c-14/keys/centos.rpm
+    yum makecache
+    sudo yum install -y postgrespro-1c-14-contrib
+    /opt/pgpro/1c-14/bin/pg-setup initdb --locale=ru_RU.UTF8 -D
+    /opt/pgpro/1c-14/bin/pg-setup service enable
+    /opt/pgpro/1c-14/bin/pg-setup service start    
+  SHELL
+end
+ 
