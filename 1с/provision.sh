@@ -29,7 +29,7 @@ localedef -i ru_RU -f UTF-8 ru_RU.UTF-8
 localectl set-locale LANG=ru_RU.utf8
 # test disk (buffered disk reads > 300MB)
 hdparm -Tt $SYS_DISK > /test.disk.result
-
+sleep 60
 
 # Postgresql
 rpm -i https://repo.postgrespro.ru/pg1c-14/keys/centos.rpm
@@ -37,8 +37,7 @@ yum makecache
 sleep 10
 yum install -y postgrespro-1c-14
 /opt/pgpro/1c-14/bin/pg-setup initdb --locale=ru_RU.UTF8 -D $DB_PATH
-/opt/pgpro/1c-14/bin/pg-setup service enable
-/opt/pgpro/1c-14/bin/pg-setup service start
+/opt/pgpro/1c-14/bin/pg-setup service --now enable
 echo "PATH=/usr/local/sbin:/usr/sbin:/usr/bin/:/opt/pgpro/1c-14/bin/:/root/bin" > /etc/environment
 sudo -u postgres /opt/pgpro/1c-14/bin/psql -U postgres -c "alter user postgres with password '$PASS';"
 mkdir /var/lib/pgsql_stats_tmp
