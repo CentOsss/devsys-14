@@ -1,3 +1,9 @@
+#выключить в BIOS все C-STATE (они же Enhanced Halt State, C1E)
+#выключить HT
+
+
+#!/bin/bash
+
 #Install Postgres Pro Standard 14 on Oracle Linux for use with 1c
 # CentOS Linux release 7.9.2009 (Core)
 HOSTNAME=1csrv03
@@ -28,6 +34,7 @@ hdparm -Tt $SYS_DISK > /test.disk.result
 # Postgresql
 rpm -i https://repo.postgrespro.ru/pg1c-14/keys/centos.rpm
 yum makecache
+sleep 10
 yum install -y postgrespro-1c-14
 /opt/pgpro/1c-14/bin/pg-setup initdb --locale=ru_RU.UTF8 -D $DB_PATH
 /opt/pgpro/1c-14/bin/pg-setup service enable
@@ -40,7 +47,11 @@ echo "tmpfs /var/lib/pgsql_stats_tmp tmpfs size=512M,uid=postgres,gid=postgres 0
 mount /var/lib/pgsql_stats_tmp
 echo "stats_temp_directory = '/var/lib/pgsql_stats_tmp'" >> /var/lib/pgpro/1c-14/data/postgresql.conf
 echo "listen_addresses = '*' " >> /var/lib/pgpro/1c-14/data/postgresql.conf
-systemctl restart postgrespro-1c-14.service
+
+
+
+sudo -u postgres /opt/pgpro/1c-14/bin/psql -U postgres -c "SELECT pg_reload_conf();"
+#systemctl restart postgrespro-1c-14.service
 
 
 
