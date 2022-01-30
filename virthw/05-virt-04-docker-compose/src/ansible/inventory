@@ -2,11 +2,11 @@
 manager
 
 [manager]
-node01.netology.cloud ansible_host=
+node01.netology.cloud ansible_host=62.84.125.251
 
 
 [nodes2:children]
 slave
 
 [slave]
-node02.netology.cloud ansible_host=
+node02.netology.cloud ansible_host=84.252.131.183
