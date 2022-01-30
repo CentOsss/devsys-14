@@ -61,6 +61,7 @@
 
       - name: Up all services in compose
         command: docker-compose -f /opt/stack/docker-compose.yaml up -d
+
   - hosts: nodes2
     become: yes
     become_user: root
@@ -94,10 +95,10 @@
           package={{ item }}
           state=present
           update_cache=yes
-          with_items:
-            - docker-ce
-            - docker-ce-cli
-            - containerd.io
+        with_items:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
 
       - name: Enable docker daemon
         systemd:
@@ -118,7 +119,7 @@
         become: true
 
       - name: Pull all images in compose
-        command: docker-compose -f /opt/stack/exporters/docker-composeexporters.yaml pull
+        command: docker-compose -f /opt/stack/exporters/docker-compose.exporters.yaml pull
 
       - name: Up all services in compose
-        command: docker-compose -f /opt/stack/exporters/docker-composeexporters.yaml up -d
+        command: docker-compose -f /opt/stack/exporters/docker-compose.exporters.yaml up -d
