@@ -62,9 +62,9 @@
       - name: Up all services in compose
         command: docker-compose -f /opt/stack/docker-compose.yaml up -d
   - hosts: nodes2
-      become: yes
-      become_user: root
-      remote_user: centos
+    become: yes
+    become_user: root
+    remote_user: centos
 
       tasks:
         - name: Create directory for ssh-keys
