@@ -3,3 +3,10 @@ manager
 
 [manager]
 node01.netology.cloud ansible_host=
+
+
+[nodes2:children]
+slave
+
+[slave]
+node02.netology.cloud ansible_host=
