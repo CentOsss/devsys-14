@@ -7,7 +7,7 @@ SET PGBIN=C:\Program Files\PostgreSQL\11.7-7.1C\bin
 SET PGHOST=localhost
 SET PGPORT=5432
 SET PGUSER=postgres
-SET PGPASSWORD=Lbvtnhf7373
+SET PGPASSWORD=
 REM Смена диска и переход в папку из которой запущен bat-файл
 %~d0
 CD %~dp0
