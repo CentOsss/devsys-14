@@ -1,5 +1,9 @@
 version: '2.1'
 
+networks:
+  monitoring:
+    driver: bridge
+
 services:
 
   nodeexporter:
