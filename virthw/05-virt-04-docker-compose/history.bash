@@ -19,8 +19,8 @@ yc vpc subnet create \
 --network-name net \
 --description "subnet-a"
 # create image with packer
-wget https://releases.hashicorp.com/packer/1.6.1/packer_1.6.1_linux_amd64.zip
-unzip packer_1.6.1_linux_amd64.zip
+wget https://releases.hashicorp.com/packer/1.6.1/packer_1.6.1_linux_amd64.zip && unzip packer_1.6.1_linux_amd64.zip
+
 ./packer validate centos-7-base.json # edit cloud, network id ...
 ./packer build centos-7-base.json
 yc compute image list
@@ -36,6 +36,7 @@ cd /src/terraform && terraform init
 yc iam service-account create default-sa
 yc iam key create --service-account-name default-sa --output key.json
 # назначить роль сервисному аккаунту
+# внести ID облака и папки в variable.tf
 terraform plan
 terraform apply -auto-approve
 # на новом аккаунте яндекс-облака есть ограничение на количество одновременно используемых сетей -
@@ -45,6 +46,9 @@ yc vpc subnet delete --name my-subnet-a && yc vpc network delete --name net
 yum install ansible
 cd ../ansible
 ansible-playbook provision.yml
+
+curl -u admin:admin -X POST http://<prometheus>:9090/-/reload
+
 
 terraform destroy
 
