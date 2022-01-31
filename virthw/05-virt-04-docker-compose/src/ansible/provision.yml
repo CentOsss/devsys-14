@@ -13,6 +13,10 @@
         copy: src=~/.ssh/id_rsa.pub dest=/root/.ssh/authorized_keys owner=root mode=0600
         ignore_errors: yes
 
+      - name: install env
+        command: yum -y update
+        command: yum -y install bridge-utils bind-utils iptables curl net-tools tcpdump rsync telnet openssh-server
+
       - name: Checking DNS
         command: host -t A google.com
 
@@ -74,6 +78,11 @@
       - name: Adding rsa-key in /root/.ssh/authorized_keys
         copy: src=~/.ssh/id_rsa.pub dest=/root/.ssh/authorized_keys owner=root mode=0600
         ignore_errors: yes
+
+      - name: install env
+        command: yum -y update
+        command: yum -y install bridge-utils bind-utils iptables curl net-tools tcpdump rsync telnet openssh-server
+
 
       - name: Checking DNS
         command: host -t A google.com
