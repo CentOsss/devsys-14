@@ -1,6 +1,6 @@
 #!/bin/bash
 groupadd prog
-for user in "prog1"
+for user in $(cat ./users)
 do
   useradd -g prog -p $(openssl passwd 12348765) $user
   chage -d 0 $user
