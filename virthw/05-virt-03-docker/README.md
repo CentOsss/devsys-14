@@ -36,6 +36,11 @@ https://hub.docker.com/repository/docker/nordit/nginx_srv
 Сценарий:
 
 - Высоконагруженное монолитное java веб-приложение;
+
+```
+
+```
+
 - Nodejs веб-приложение;
 - Мобильное приложение c версиями для Android и iOS;
 - Шина данных на базе Apache Kafka;
