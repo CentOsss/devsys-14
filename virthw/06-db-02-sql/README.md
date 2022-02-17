@@ -12,14 +12,36 @@
 
 Приведите получившуюся команду или docker-compose манифест.
 
+```
+version: '3.1'
+
+volumes:
+  pg_db:
+  pg_backup:
+
+services:
+  pg_db:
+    image: postgres:12
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - pg_project:/var/lib/postgresql/data
+      - pg_backup:/var/lib/postgresql/backup
+    ports:
+      - ${POSTGRES_PORT:-5432}:5432
+```
 ## Задача 2
 
 В БД из задачи 1: 
 - создайте пользователя test-admin-user и БД test_db
+```
+CREATE DATABASE test_db;
+CREATE ROLE "test-admin-user" WITH LOGIN PASSWORD 'test';
+```
 - в БД test_db создайте таблицу orders и clients (спeцификация таблиц ниже)
-- предоставьте привилегии на все операции пользователю test-admin-user на таблицы БД test_db
-- создайте пользователя test-simple-user  
-- предоставьте пользователю test-simple-user права на SELECT/INSERT/UPDATE/DELETE данных таблиц БД test_db
 
 Таблица orders:
 - id (serial primary key)
@@ -31,12 +53,135 @@
 - фамилия (string)
 - страна проживания (string, index)
 - заказ (foreign key orders)
+```
+CREATE TABLE orders                                   
+(
+    Id SERIAL PRIMARY KEY,
+    name VARCHAR,
+    price INT
+);
+ 
+CREATE TABLE clients
+(
+    Id SERIAL PRIMARY KEY,
+    lastname VARCHAR, 
+    country VARCHAR,
+    order_number INT, 
+    FOREIGN KEY (order_number) REFERENCES orders (Id)
+);
+```
+
+- предоставьте привилегии на все операции пользователю test-admin-user на таблицы БД test_db
+```
+GRANT ALL ON table public.orders,public.clients TO "test-admin-user";
+```
+- создайте пользователя test-simple-user  
+- предоставьте пользователю test-simple-user права на SELECT/INSERT/UPDATE/DELETE данных таблиц БД test_db
+```
+CREATE ROLE "simple-test-user" WITH LOGIN PASSWORD 'test';
+GRANT SELECT,INSERT,UPDATE,DELETE ON table public.orders,public.clients TO "simple-test-user";
+```
+
 
 Приведите:
 - итоговый список БД после выполнения пунктов выше,
+```
+SELECT datname,datcollate,datctype,datacl  FROM pg_database;
+
+datname  |datcollate|datctype  |datacl                                                             |
+---------+----------+----------+-------------------------------------------------------------------+
+postgres |en_US.utf8|en_US.utf8|NULL                                                               |
+template1|en_US.utf8|en_US.utf8|{=c/postgres,postgres=CTc/postgres}                                |
+template0|en_US.utf8|en_US.utf8|{=c/postgres,postgres=CTc/postgres}                                |
+test_db  |en_US.utf8|en_US.utf8|{=Tc/postgres,postgres=CTc/postgres,"test-admin-user"=CTc/postgres}|
+
+test_db-# \l
+                                 List of databases
+   Name    |  Owner   | Encoding |  Collate   |   Ctype    |   Access privileges
+-----------+----------+----------+------------+------------+-----------------------
+ postgres  | postgres | UTF8     | en_US.utf8 | en_US.utf8 |
+ template0 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+ template1 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+ test_db   | postgres | UTF8     | en_US.utf8 | en_US.utf8 |
+```
 - описание таблиц (describe)
+```
+test_db-# \d clients
+                                    Table "public.clients"
+    Column    |       Type        | Collation | Nullable |               Default
+--------------+-------------------+-----------+----------+-------------------------------------
+ id           | integer           |           | not null | nextval('clients_id_seq'::regclass)
+ lastname     | character varying |           |          |
+ country      | character varying |           |          |
+ order_number | integer           |           |          |
+Indexes:
+    "clients_pkey" PRIMARY KEY, btree (id)
+    "ctry" btree (country)
+Foreign-key constraints:
+    "clients_order_number_fkey" FOREIGN KEY (order_number) REFERENCES orders(id)
+```
+```
+test_db-# \d orders
+                                 Table "public.orders"
+ Column |       Type        | Collation | Nullable |              Default
+--------+-------------------+-----------+----------+------------------------------------
+ id     | integer           |           | not null | nextval('orders_id_seq'::regclass)
+ name   | character varying |           |          |
+ price  | integer           |           |          |
+Indexes:
+    "orders_pkey" PRIMARY KEY, btree (id)
+Referenced by:
+    TABLE "clients" CONSTRAINT "clients_order_number_fkey" FOREIGN KEY (order_number) REFERENCES orders(id)
+```
 - SQL-запрос для выдачи списка пользователей с правами над таблицами test_db
+```
+SELECT grantee,table_name,privilege_type,is_grantable
+FROM information_schema.role_table_grants 
+WHERE table_name='clients' or table_name='orders'
+;
+```
 - список пользователей с правами над таблицами test_db
+```grantee         |table_name|privilege_type|is_grantable|
+----------------+----------+--------------+------------+
+postgres        |orders    |INSERT        |YES         |
+postgres        |orders    |SELECT        |YES         |
+postgres        |orders    |UPDATE        |YES         |
+postgres        |orders    |DELETE        |YES         |
+postgres        |orders    |TRUNCATE      |YES         |
+postgres        |orders    |REFERENCES    |YES         |
+postgres        |orders    |TRIGGER       |YES         |
+simple-test-user|orders    |INSERT        |NO          |
+simple-test-user|orders    |SELECT        |NO          |
+simple-test-user|orders    |UPDATE        |NO          |
+simple-test-user|orders    |DELETE        |NO          |
+test-admin-user |orders    |INSERT        |NO          |
+test-admin-user |orders    |SELECT        |NO          |
+test-admin-user |orders    |UPDATE        |NO          |
+test-admin-user |orders    |DELETE        |NO          |
+test-admin-user |orders    |TRUNCATE      |NO          |
+test-admin-user |orders    |REFERENCES    |NO          |
+test-admin-user |orders    |TRIGGER       |NO          |
+postgres        |clients   |INSERT        |YES         |
+postgres        |clients   |SELECT        |YES         |
+postgres        |clients   |UPDATE        |YES         |
+postgres        |clients   |DELETE        |YES         |
+postgres        |clients   |TRUNCATE      |YES         |
+postgres        |clients   |REFERENCES    |YES         |
+postgres        |clients   |TRIGGER       |YES         |
+simple-test-user|clients   |INSERT        |NO          |
+simple-test-user|clients   |SELECT        |NO          |
+simple-test-user|clients   |UPDATE        |NO          |
+simple-test-user|clients   |DELETE        |NO          |
+test-admin-user |clients   |INSERT        |NO          |
+test-admin-user |clients   |SELECT        |NO          |
+test-admin-user |clients   |UPDATE        |NO          |
+test-admin-user |clients   |DELETE        |NO          |
+test-admin-user |clients   |TRUNCATE      |NO          |
+test-admin-user |clients   |REFERENCES    |NO          |
+test-admin-user |clients   |TRIGGER       |NO          |
+```
 
 ## Задача 3
 

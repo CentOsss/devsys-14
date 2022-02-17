@@ -1,0 +1,21 @@
+#apt install postgresql-client
+
+version: '3.1'
+
+volumes:
+  pg_db:
+  pg_backup:
+
+services:
+  pg_db:
+    image: postgres:12
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - pg_project:/var/lib/postgresql/data
+      - pg_backup:/var/lib/postgresql/backup
+    ports:
+      - ${POSTGRES_PORT:-5432}:5432
