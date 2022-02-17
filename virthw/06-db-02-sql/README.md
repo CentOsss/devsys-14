@@ -197,6 +197,12 @@ test-admin-user |clients   |TRIGGER       |NO          |
 |Монитор| 7000|
 |Гитара| 4000|
 
+```
+insert into orders (name, price) values 
+    ('Книга', 500), 
+    ('Монитор', 7000), 
+    ('Гитара', 4000);
+```
 Таблица clients
 
 |ФИО|Страна проживания|
@@ -207,10 +213,30 @@ test-admin-user |clients   |TRIGGER       |NO          |
 |Ронни Джеймс Дио| Russia|
 |Ritchie Blackmore| Russia|
 
+```
+insert into clients (lastname, country) values 
+    ('Иванов Иван Иванович', 'USA'),  
+    ('Петров Петр Петрович', 'Canada'), 
+    ('Иоганн Себастьян Бах', 'Japan'),
+    ('Ронни Джеймс Дио', 'Russia'),
+    ('Ritchie Blackmore', 'Russia');
+```
 Используя SQL синтаксис:
 - вычислите количество записей для каждой таблицы 
 - приведите в ответе:
     - запросы 
+```
+select count(*) from clients;
+
+count|
+-----+
+    5|
+select count(*) from orders;
+
+count|
+-----+
+    5|
+```
     - результаты их выполнения.
 
 ## Задача 4
