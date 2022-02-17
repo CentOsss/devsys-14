@@ -252,10 +252,16 @@ count|
 |Иоганн Себастьян Бах| Гитара |
 
 Приведите SQL-запросы для выполнения данных операций.
+```
+update clients set order_number = 3 where id = 3;
+update clients set order_number = 4 where id = 4;
+update clients set order_number = 5 where id = 5;
+```
 
 Приведите SQL-запрос для выдачи всех пользователей, которые совершили заказ, а также вывод данного запроса.
- 
-Подсказк - используйте директиву `UPDATE`.
+ ```
+select * from clients where order_number is not null;
+```
 
 ## Задача 5
 
@@ -263,6 +269,15 @@ count|
 (используя директиву EXPLAIN).
 
 Приведите получившийся результат и объясните что значат полученные значения.
+```
+EXPLAIN select * from clients where order_number is not null;
+
+QUERY PLAN                                               |
+---------------------------------------------------------+
+Seq Scan on clients  (cost=0.00..18.10 rows=806 width=72)|
+  Filter: (order_number IS NOT NULL)                     |
+```
+
 
 ## Задача 6
 
