@@ -42,7 +42,7 @@ ORDER BY ProductCount ASC ;
 
 
 
-
+drop database test_db;
 
 
 
