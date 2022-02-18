@@ -15,7 +15,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=postgres
     volumes:
-      - pg_project:/var/lib/postgresql/data
+      - pg_db:/var/lib/postgresql/data
       - pg_backup:/var/lib/postgresql/backup
     ports:
       - ${POSTGRES_PORT:-5432}:5432
