@@ -270,12 +270,32 @@ select * from clients where order_number is not null;
 
 Приведите получившийся результат и объясните что значат полученные значения.
 ```
-EXPLAIN select * from clients where order_number is not null;
+explain (FORMAT JSON) select * from clients where country  is not null;
 
-QUERY PLAN                                               |
----------------------------------------------------------+
-Seq Scan on clients  (cost=0.00..18.10 rows=806 width=72)|
-  Filter: (order_number IS NOT NULL)                     |
+[
+  {
+    "Plan": {
+      "Node Type": "Seq Scan",
+      "Parallel Aware": false,
+      "Relation Name": "clients",
+      "Alias": "clients",
+      "Startup Cost": 0.00,
+      "Total Cost": 18.10,
+      "Plan Rows": 806,
+      "Plan Width": 72,
+      "Filter": "(country IS NOT NULL)"
+    }
+  }
+]
+```
+```
+В данном случае мы видим, что планировщик запросов выбрал план из одного этапа -
+последовательное сканирование("Node Type": "Seq Scan",).
+В качестве фильтра будет применено условие("Filter": "(country IS NOT NULL)") на
+которое будет проверяться каждая обработанная строка. Мы видим примерную оценку
+стоимости запуска запроса ("Startup Cost": 0.00) и примерную оценку выполнения
+всего запроса ("Total Cost": 18.10). "Plan Rows": 806 и "Plan Width": 72 означа-
+ют ожидаемое число строк которое должен вывести план и размер строк в байтах соответсвенно.
 ```
 
 
@@ -292,6 +312,31 @@ Seq Scan on clients  (cost=0.00..18.10 rows=806 width=72)|
 Приведите список операций, который вы применяли для бэкапа данных и восстановления. 
 
 ---
+```
+# выгружаем дамп всех бах и существующие роли
+
+docker exec -i root_pg_db_1 sh -c 'pg_dumpall -U postgres  > \
+/var/lib/postgresql/backup/test_db.dump'
+
+
+# останавливаем и удаляем работающий контейнер
+
+docker-compose down 
+
+# поднимаем новый контейнер и подключаем 
+# новый volume хранения данных: pg_db2:/var/lib/postgresql/data
+# и старый с нашим бэкапом: pg_backup:/var/lib/postgresql/backup
+# запускаем новый контейнер с чистой базой 
+
+docker-compose -f docker-compose2.yml up -d 
+
+# восстанавливаем кластер со всеми ролями и базами данных
+
+docker exec -i root_pg_db2_1 sh -c \
+'psql -U postgres -f /var/lib/postgresql/backup/test_db.dump postgres'
+
+
+```
 
 ### Как cдавать задание
 
