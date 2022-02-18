@@ -261,6 +261,12 @@ update clients set order_number = 5 where id = 5;
 Приведите SQL-запрос для выдачи всех пользователей, которые совершили заказ, а также вывод данного запроса.
  ```
 select * from clients where order_number is not null;
+
+id|lastname            |country|order_number|
+--+--------------------+-------+------------+
+ 3|Иванов Иван Иванович|USA    |           3|
+ 4|Петров Петр Петрович|Canada |           4|
+ 5|Иоганн Себастьян Бах|Japan  |           5|
 ```
 
 ## Задача 5
