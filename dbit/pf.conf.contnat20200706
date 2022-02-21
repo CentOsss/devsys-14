@@ -1,0 +1,153 @@
+# tcpdump -n -e -ttt -i pflog0
+ext_if_1 = "vlan150"
+dmz_if = "vlan3"
+int_if_1 = "em1"
+int_if_2 = "vlan2"
+int_if_3 = "vlan900"
+int_if_4 = "vlan66"
+
+
+table <lan_work> {172.16.0.0/16, !172.20.0.0/16, !172.16.25.0/24, !172.16.13.0/24, !172.16.15.27, !172.16.22.147, !172.16.23.75, !172.16.0.1, !172.16.0.5 } #create table for redirect on squid
+table <sub13> file "/etc/subnet13" #table for direct NAT
+table <domino>   {172.16.0.0/16, !172.16.0.2, !172.16.0.8, !172.16.0.9, !172.16.0.16, !172.16.0.36, !172.16.13.46} #for block on VLAN66
+table <no_squid_host>  {192.168.5.0/24, 192.168.204.0/24}
+priv_nets = "{ 127.0.0.0/8, 172.16.0.0/16}"
+
+tcp_in="{ftp,ftp-data,ssh,pop3,smtp,domain,http,443,444}"
+udp_in="{domain,5060}"
+tcp_out="{ssh, 21, http, https,110, 123, pop3s, pptp, 143, 465, 873, 993}"
+udp_out="{53,87,123}"
+
+wotu="32801:32825, 20014"
+wott="3128,8081,8088,53,80,8080,20000:25000,32801,32803,443"
+
+icmp_types = "echoreq"
+
+set block-policy drop
+set loginterface $ext_if_1
+set limit { frags 100000, states 100000, src-nodes 1000000 }
+set optimization normal
+set skip on lo
+
+
+#Ftp-proxy anchor
+anchor "ftp-proxy/*"
+
+#Redirect to FTP proxy
+pass in quick on {$int_if_1,$int_if_2} inet proto tcp to port ftp divert-to 127.0.0.1 port 8021
+
+#Redirect to HTTP proxy
+pass in quick on {$int_if_1,$int_if_2} proto tcp from {<lan_work>} to {!<no_squid_host>} port 80 rdr-to 172.16.0.1 port 3128
+
+#OpenOutPorts
+pass out quick on $ext_if_1 proto tcp from {<lan_work>} to any port $tcp_out nat-to 89.223.65.148
+pass out quick on $ext_if_1 proto udp from {<lan_work>} to any port $udp_out nat-to 89.223.65.148
+
+#Nat vlan66 wi-fi INET
+pass out quick on $ext_if_1 proto {tcp,udp} from 172.20.0.0/16 to any port {!=25} nat-to 89.223.65.148
+
+#Nat for 13subnet
+pass out quick on $ext_if_1 proto {tcp,udp} from {<sub13>} to any port $tcp_out nat-to 89.223.65.148
+
+#Nat DOMINO
+pass out quick on $ext_if_1 proto {tcp,gre} from 172.16.0.2 to any nat-to 89.223.65.148 #Nat Domino
+
+
+#Nat for other
+
+pass out quick on $ext_if_1 proto {tcp,gre} from 172.16.0.2 to any nat-to 89.223.65.148 #Nat Domino      
+pass out quick on $ext_if_1 proto {tcp,udp} from 172.16.0.3 to any port {!=25} nat-to 89.223.65.148  #Nat NewIntra         
+pass out quick on $ext_if_1 proto {tcp,udp} from 172.16.0.5 to any port {!=25} nat-to 89.223.65.148 #Nat Vega  
+pass out quick on $ext_if_1 proto {tcp,udp} from 172.16.0.8 to any port {!=25} nat-to 89.223.65.148
+pass out quick on $ext_if_1 proto {tcp,udp} from 172.16.0.36 to any port {!=25} nat-to 89.223.65.148  #Nat Asterisk   
+pass out quick on $ext_if_1 proto {tcp,udp} from 172.16.0.30 to any port {!=25} nat-to 89.223.65.148 #Xen
+pass out quick on $ext_if_1 proto icmp from 172.16.13.2 to any nat-to 89.223.65.148
+pass out quick on $ext_if_1 proto icmp from 172.16.13.5 to any nat-to 89.223.65.148
+pass out quick on $ext_if_1 proto icmp from 172.16.13.63 to any nat-to 89.223.65.148 #router block-monitoring
+pass out quick on $ext_if_1 proto {tcp,udp} from 172.16.15.12 to any port {!=25} nat-to 89.223.65.148
+pass out quick on $ext_if_1 proto {tcp,udp} from 172.16.15.17 to any port {27014:27050} nat-to 89.223.65.148
+pass out quick on $ext_if_1 proto {tcp,udp} from 172.16.15.27 to any port {!=25} nat-to 89.223.65.148
+pass out quick on $ext_if_1 proto tcp from 172.16.15.27 to any port {$wott} nat-to 89.223.65.148
+pass out quick on $ext_if_1 proto udp from 172.16.15.27 to any port {$wotu} nat-to 89.223.65.148
+pass out quick on $ext_if_1 proto {tcp,udp} from 172.16.15.60 to any port {!=25} nat-to 89.223.65.148
+pass out quick on $ext_if_1 proto tcp from 172.16.15.71 to any port {!=25} nat-to 89.223.65.148
+pass out quick on $ext_if_1 proto tcp from 172.16.15.75 to any port {!=25} nat-to 89.223.65.148 #KassaSM_Sitchenko_1Flour
+
+
+# Redirect to intranet
+pass in quick on $ext_if_1 proto {tcp,udp} to 89.223.65.148 port 2222 rdr-to 172.16.10.150 port 443
+pass in quick on $ext_if_1 proto {tcp,udp} to 89.223.65.148 port 80 rdr-to 172.16.0.2 port 80
+pass in quick on $ext_if_1 proto tcp to 89.223.65.148 port 1723 rdr-to 172.16.0.2
+pass in quick on $ext_if_1 proto gre to 89.223.65.148 rdr-to 172.16.0.2
+
+
+
+
+
+
+block in
+
+
+# Pass out
+pass out proto { udp, icmp, gre } all keep state
+
+
+#Vlan66-to-lan block
+block in quick on $int_if_4 proto {tcp,udp,icmp} from {<domino>} to any
+block out quick on $int_if_4 proto {tcp,udp,icmp} from {<domino>} to any
+
+# Urpf checking (anti-spoof)
+block in quick from urpf-failed
+
+
+# OpenPORTS
+pass quick on $ext_if_1 inet proto tcp from any to 89.223.65.148 port {ftp,ftp-data,ssh,smtp,domain,http,443,444} flags S/SA keep state
+pass quick on $ext_if_1 inet proto udp from any to 89.223.65.148 port {domain,5060} keep state
+# VPN on external interface
+pass in quick on $ext_if_1 inet proto tcp from any to $ext_if_1 port 1723 flags S/SA modulate state
+pass out quick on $ext_if_1 inet proto gre from any to any keep state
+pass in quick on $ext_if_1 inet proto gre from any to any keep state
+
+
+
+
+# Block internal network on external interface
+block drop in quick on $ext_if_1 from $priv_nets to any
+block drop out quick on $ext_if_1 from any to $priv_nets
+
+
+# Icmp
+pass in inet proto icmp all icmp-type $icmp_types keep state
+
+
+pass quick on {$dmz_if} from $dmz_if:network to any
+
+pass in quick on {$ext_if_1, $dmz_if} proto { tcp, udp, gre } from any to 89.223.65.148
+
+#VNC,RDP,SMB block on VLAN 2, 900
+pass in quick on {$int_if_3, $int_if_2} proto {tcp,udp} from 192.168.204.6 to {172.16.0.33,172.16.0.34} #replication SERVER-A Global
+pass in quick on {$int_if_3, $int_if_2} proto {tcp,udp} from 172.17.0.15 to {172.16.0.5, 172.16.0.10} #Taurus DC nord.ru
+pass in quick on {$int_if_3, $int_if_2} proto {tcp,udp} from {172.17.20.35, 172.17.20.98} to 172.16.13.223 # DesertVintage(N44) to 1c SmallBusiness
+pass in quick on {$int_if_3, $int_if_2} proto {tcp,udp} from 192.168.37/24 to any port {25 587 465 110 995 143 993 445 3389 1521} #Sladosti
+pass in quick on {$int_if_3, $int_if_2} proto {tcp,udp} from 172.17.21.89 to 172.16.0.4 port 445 #Volokov
+pass in quick on {$int_if_3, $int_if_2} proto {tcp,udp} from 172.17.20.43 to 172.16.0.4 port 445 #Molotilov
+pass in quick on {$int_if_3, $int_if_2} proto {tcp,udp} from 192.168.204.31 to any port {25 587 465 110 995 143 993 445} #Musatov
+pass in quick on {$int_if_3, $int_if_2} proto {tcp,udp} from 172.17.20.2 to any port 445 #RinatShagvaliev
+pass in quick on {$int_if_3, $int_if_2} proto {tcp,udp} from 172.17.20.41 to any port 445 #Koskina
+pass in quick on {$int_if_3, $int_if_2} proto {tcp,udp} from 172.17.20.11 to any port 445 #Koskina
+block in quick on {$int_if_3, $int_if_2} proto {tcp,udp} from any to any port {5900 5901 5902 5903 5904 5905} #block VNC-protocol from vlan2,900
+block in quick on {$int_if_3, $int_if_2} proto {tcp,udp} from 172.16.0.200 to any
+block in quick on {$int_if_3, $int_if_2} proto {tcp,udp} from any to any
+
+
+
+
+# Pass all on internal interfaces
+pass in quick on $int_if_1 proto {tcp,udp,gre} from any to any
+pass out quick on $int_if_1 proto {tcp,udp,gre} from any to any
+pass in quick on tun0 proto {tcp,udp} from any to any
+pass out quick on tun0 proto {tcp,udp} from any to any
+pass in quick on tun1 proto {tcp,udp,icmp} from any to any
+pass out quick on tun1 proto {tcp,udp,icmp} from any to any
+
+

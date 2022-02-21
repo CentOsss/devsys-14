@@ -1,0 +1,6 @@
+file="hosts.txt"
+for IP in $(cat $file)
+do ssh-copy-id root@$IP
+done
+ 
+	
