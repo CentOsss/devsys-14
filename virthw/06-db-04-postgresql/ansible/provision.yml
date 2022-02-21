@@ -66,8 +66,8 @@
       - name: Up all services in compose
         command: docker-compose -f /opt/stack/docker-compose.yml up -d
 
-      - name: Restore dump
-        command: docker exec -i root_pg_db2_1 sh -c 'psql -U postgres -f /var/lib/postgresql/backup/test_db.dump postgres'
+      - name: Restore Dump
+        command: docker exec -i stack_pg_db_1 sh -c 'psql -U postgres -f /opt/stack/root_pg_backup/_data/test_db.dump postgres'
 
 
 
