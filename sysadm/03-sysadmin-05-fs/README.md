@@ -15,7 +15,7 @@
 резервных копий дисков и/или разделов, созданных спец. ПО.
 ```
 
-2. Могут ли файлы, являющиеся жесткой ссылкой на один объект, иметь разные права доступа и владельца? Почему?
+1. огут ли файлы, являющиеся жесткой ссылкой на один объект, иметь разные права доступа и владельца? Почему?
 
 ```
 Нет, не могут. Ссылки - это просто именные указатели на один и тот же набор метаданных одного объекта.
@@ -132,79 +132,170 @@ mdadm: array /dev/md0 started.
 1. Создайте 2 независимых PV на получившихся md-устройствах.
 
 ```
-
+root@vagrant:~# pvcreate /dev/md1 /dev/md0
+  Physical volume "/dev/md1" successfully created.
+  Physical volume "/dev/md0" successfully created.
 ```
 
 1. Создайте общую volume-group на этих двух PV.
 
 ```
+root@vagrant:~# vgcreate vg1 /dev/md1 /dev/md0
+  Volume group "vg1" successfully created
 
+root@vagrant:~# vgdisplay
+  --- Volume group ---
+  VG Name               vgvagrant
+  System ID             
+  Format                lvm2
+  Metadata Areas        1
+  Metadata Sequence No  3
+  VG Access             read/write
+  VG Status             resizable
+  MAX LV                0
+  Cur LV                2
+  Open LV               2
+  Max PV                0
+  Cur PV                1
+  Act PV                1
+  VG Size               <63.50 GiB
+  PE Size               4.00 MiB
+  Total PE              16255
+  Alloc PE / Size       16255 / <63.50 GiB
+  Free  PE / Size       0 / 0   
+  VG UUID               5zL1A7-9ldG-J06F-1Pnu-m7we-mAzr-wBnOoF
+   
+  --- Volume group ---
+  VG Name               vg1
+  System ID             
+  Format                lvm2
+  Metadata Areas        2
+  Metadata Sequence No  1
+  VG Access             read/write
+  VG Status             resizable
+  MAX LV                0
+  Cur LV                0
+  Open LV               0
+  Max PV                0
+  Cur PV                2
+  Act PV                2
+  VG Size               2.49 GiB
+  PE Size               4.00 MiB
+  Total PE              638
+  Alloc PE / Size       0 / 0   
+  Free  PE / Size       638 / 2.49 GiB
+  VG UUID               tojQnc-yOx3-L2uF-35cS-agip-bkwo-5Sz4ol
 ```
 
 1. Создайте LV размером 100 Мб, указав его расположение на PV с RAID0.
 
 ```
-
+root@vagrant:~# lvcreate -L 100M vg1 /dev/md0
+  Logical volume "lvol0" created.
+root@vagrant:~# vgs
+  VG        #PV #LV #SN Attr   VSize   VFree
+  vg1         2   1   0 wz--n-   2.49g 2.39g
+  vgvagrant   1   2   0 wz--n- <63.50g    0 
+root@vagrant:~# lvs
+  LV     VG        Attr       LSize   Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
+  lvol0  vg1       -wi-a----- 100.00m                                                    
+  root   vgvagrant -wi-ao---- <62.54g                                                    
+  swap_1 vgvagrant -wi-ao---- 980.00m  
 ```
 
 1. Создайте `mkfs.ext4` ФС на получившемся LV.
 
 ```
+root@vagrant:~# mkfs.ext4 /dev/vg1/lvol0
+mke2fs 1.45.5 (07-Jan-2020)
+Creating filesystem with 25600 4k blocks and 25600 inodes
 
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (1024 blocks): done
+Writing superblocks and filesystem accounting information: done
 ```
 
 1. Смонтируйте этот раздел в любую директорию, например, `/tmp/new`.
 
 ```
+root@vagrant:~# mkdir /tmp/new
+root@vagrant:~# mount /dev/vg1/lvol0 /tmp/new
 
 ```
 
 1. Поместите туда тестовый файл, например `wget https://mirror.yandex.ru/ubuntu/ls-lR.gz -O /tmp/new/test.gz`.
 
 ```
-
+root@vagrant:~# wget https://mirror.yandex.ru/ubuntu/ls-lR.gz -O /tmp/new/test.gz
+Saving to: ‘/tmp/new/test.gz’
+/tmp/new/test.gz     100%[=====================>]  19.54M  6.65MB/s    in 2.9s    
 ```
 
 1. Прикрепите вывод `lsblk`.
 
 ```
-
+root@vagrant:~# lsblk
+NAME                 MAJ:MIN RM  SIZE RO TYPE  MOUNTPOINT
+sda                    8:0    0   64G  0 disk  
+├─sda1                 8:1    0  512M  0 part  /boot/efi
+├─sda2                 8:2    0    1K  0 part  
+└─sda5                 8:5    0 63.5G  0 part  
+  ├─vgvagrant-root   253:0    0 62.6G  0 lvm   /
+  └─vgvagrant-swap_1 253:1    0  980M  0 lvm   [SWAP]
+sdb                    8:16   0  2.5G  0 disk  
+├─sdb1                 8:17   0    2G  0 part  
+│ └─md1                9:1    0    2G  0 raid1 
+└─sdb2                 8:18   0  511M  0 part  
+  └─md0                9:0    0  510M  0 raid1 
+    └─vg1-lvol0      253:2    0  100M  0 lvm   /tmp/new
+sdc                    8:32   0  2.5G  0 disk  
+├─sdc1                 8:33   0    2G  0 part  
+│ └─md1                9:1    0    2G  0 raid1 
+└─sdc2                 8:34   0  511M  0 part  
+  └─md0                9:0    0  510M  0 raid1 
+    └─vg1-lvol0      253:2    0  100M  0 lvm   /tmp/new
 ```
 
 1. Протестируйте целостность файла:
 
-    ```bash
-    root@vagrant:~# gzip -t /tmp/new/test.gz
-    root@vagrant:~# echo $?
-    0
-    ```
+```
+gzip -t /tmp/new/test.gz && echo $?
+0
+```
 
 1. Используя pvmove, переместите содержимое PV с RAID0 на RAID1.
 
 ```
-
+root@vagrant:~# pvmove /dev/md0
+  /dev/md0: Moved: 12.00%
+  /dev/md0: Moved: 100.00%
 ```
 
 1. Сделайте `--fail` на устройство в вашем RAID1 md.
 
 ```
-
+root@vagrant:~# mdadm /dev/md1 --fail /dev/sdb1
+mdadm: set /dev/sdb1 faulty in /dev/md1
 ```
 
 1. Подтвердите выводом `dmesg`, что RAID1 работает в деградированном состоянии.
 
 ```
-
+root@vagrant:~# dmesg |grep md1
+[  480.422928] md/raid1:md1: not clean -- starting background reconstruction
+[  480.422930] md/raid1:md1: active with 2 out of 2 mirrors
+[  480.422945] md1: detected capacity change from 0 to 2144337920
+[  480.425781] md: resync of RAID array md1
+[  490.758344] md: md1: resync done.
+[ 2325.890719] md/raid1:md1: Disk failure on sdb1, disabling device.
+               md/raid1:md1: Operation continuing on 1 devices.
 ```
 
 1. Протестируйте целостность файла, несмотря на "сбойный" диск он должен продолжать быть доступен:
 
-    ```bash
-    root@vagrant:~# gzip -t /tmp/new/test.gz
-    root@vagrant:~# echo $?
-    0
-    ```
-
-
- 
+```
+root@vagrant:~# gzip -t /tmp/new/test.gz && echo $?
+0
+```
  ---
