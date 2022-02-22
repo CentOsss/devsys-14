@@ -9,6 +9,11 @@ resource "yandex_compute_instance" "node01" {
     memory = 8
   }
 
+  resource "yandex_compute_disk" "default" {
+  name     = "disk-lvm"
+  type     = "network-nvme"
+  size        = "50"
+  }
 
   boot_disk {
     initialize_params {
