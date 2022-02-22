@@ -1,12 +1,18 @@
 resource "yandex_compute_instance" "node01" {
   name                      = "node01"
   zone                      = "ru-central1-a"
-  hostname                  = "node01.db.cloud"
+  hostname                  = "node01.netology.cloud"
   allow_stopping_for_update = true
 
   resources {
-    cores  = 4
-    memory = 4
+    cores  = 8
+    memory = 8
+  }
+
+  resource "yandex_compute_disk" "default" {
+  name     = "disk-lvm"
+  type     = "network-nvme"
+  size        = "50"
   }
 
   boot_disk {
