@@ -39,28 +39,137 @@
     ```
 
     Данная конфигурация создаст новую виртуальную машину с двумя дополнительными неразмеченными дисками по 2.5 Гб.
+```
+root@vagrant:~# lsblk
+NAME                 MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda                    8:0    0   64G  0 disk 
+├─sda1                 8:1    0  512M  0 part /boot/efi
+├─sda2                 8:2    0    1K  0 part 
+└─sda5                 8:5    0 63.5G  0 part 
+  ├─vgvagrant-root   253:0    0 62.6G  0 lvm  /
+  └─vgvagrant-swap_1 253:1    0  980M  0 lvm  [SWAP]
+sdb                    8:16   0  2.5G  0 disk 
+sdc                    8:32   0  2.5G  0 disk 
+
+```
+
 
 1. Используя `fdisk`, разбейте первый диск на 2 раздела: 2 Гб, оставшееся пространство.
 
+```
+Device     Boot   Start     End Sectors  Size Id Type
+/dev/sdb1          2048 4196351 4194304    2G 83 Linux
+/dev/sdb2       4196352 5242879 1046528  511M 83 Linux
+```
+
 1. Используя `sfdisk`, перенесите данную таблицу разделов на второй диск.
+
+```
+d /dev/sdb|sfdisk --force /dev/sdc
+Checking that no-one is using this disk right now ... OK
+
+Disk /dev/sdc: 2.51 GiB, 2684354560 bytes, 5242880 sectors
+Disk model: VBOX HARDDISK   
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+
+>>> Script header accepted.
+>>> Script header accepted.
+>>> Script header accepted.
+>>> Script header accepted.
+>>> Created a new DOS disklabel with disk identifier 0xb289fd48.
+/dev/sdc1: Created a new partition 1 of type 'Linux' and of size 2 GiB.
+/dev/sdc2: Created a new partition 2 of type 'Linux' and of size 511 MiB.
+/dev/sdc3: Done.
+....
+
+Disk /dev/sdb: 2.51 GiB, 2684354560 bytes, 5242880 sectors
+Disk model: VBOX HARDDISK   
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0xb289fd48
+
+Device     Boot   Start     End Sectors  Size Id Type
+/dev/sdb1          2048 4196351 4194304    2G 83 Linux
+/dev/sdb2       4196352 5242879 1046528  511M 83 Linux
+
+```
 
 1. Соберите `mdadm` RAID1 на паре разделов 2 Гб.
 
+```
+root@vagrant:~# mdadm --create --verbose /dev/md1 -l 1 -n 2 /dev/sd{b1,c1}
+mdadm: Note: this array has metadata at the start and
+    may not be suitable as a boot device.  If you plan to
+    store '/boot' on this device please ensure that
+    your boot-loader understands md/v1.x metadata, or use
+    --metadata=0.90
+mdadm: size set to 2094080K
+Continue creating array? y
+mdadm: Defaulting to version 1.2 metadata
+mdadm: array /dev/md1 started.
+```
+
 1. Соберите `mdadm` RAID0 на второй паре маленьких разделов.
+
+```
+root@vagrant:~# mdadm --create --verbose /dev/md0 -l 1 -n 2 /dev/sd{b2,c2}
+mdadm: Note: this array has metadata at the start and
+    may not be suitable as a boot device.  If you plan to
+    store '/boot' on this device please ensure that
+    your boot-loader understands md/v1.x metadata, or use
+    --metadata=0.90
+mdadm: size set to 522240K
+Continue creating array? н
+Continue creating array? (y/n) y
+mdadm: Defaulting to version 1.2 metadata
+mdadm: array /dev/md0 started.
+```
 
 1. Создайте 2 независимых PV на получившихся md-устройствах.
 
+```
+
+```
+
 1. Создайте общую volume-group на этих двух PV.
+
+```
+
+```
 
 1. Создайте LV размером 100 Мб, указав его расположение на PV с RAID0.
 
+```
+
+```
+
 1. Создайте `mkfs.ext4` ФС на получившемся LV.
+
+```
+
+```
 
 1. Смонтируйте этот раздел в любую директорию, например, `/tmp/new`.
 
+```
+
+```
+
 1. Поместите туда тестовый файл, например `wget https://mirror.yandex.ru/ubuntu/ls-lR.gz -O /tmp/new/test.gz`.
 
+```
+
+```
+
 1. Прикрепите вывод `lsblk`.
+
+```
+
+```
 
 1. Протестируйте целостность файла:
 
@@ -72,9 +181,21 @@
 
 1. Используя pvmove, переместите содержимое PV с RAID0 на RAID1.
 
+```
+
+```
+
 1. Сделайте `--fail` на устройство в вашем RAID1 md.
 
+```
+
+```
+
 1. Подтвердите выводом `dmesg`, что RAID1 работает в деградированном состоянии.
+
+```
+
+```
 
 1. Протестируйте целостность файла, несмотря на "сбойный" диск он должен продолжать быть доступен:
 
@@ -84,32 +205,6 @@
     0
     ```
 
-1. Погасите тестовый хост, `vagrant destroy`.
 
  
  ---
-
-## Как сдавать задания
-
-Обязательными к выполнению являются задачи без указания звездочки. Их выполнение необходимо для получения зачета и диплома о профессиональной переподготовке.
-
-Задачи со звездочкой (*) являются дополнительными задачами и/или задачами повышенной сложности. Они не являются обязательными к выполнению, но помогут вам глубже понять тему.
-
-Домашнее задание выполните в файле readme.md в github репозитории. В личном кабинете отправьте на проверку ссылку на .md-файл в вашем репозитории.
-
-Также вы можете выполнить задание в [Google Docs](https://docs.google.com/document/u/0/?tgif=d) и отправить в личном кабинете на проверку ссылку на ваш документ.
-Название файла Google Docs должно содержать номер лекции и фамилию студента. Пример названия: "1.1. Введение в DevOps — Сусанна Алиева".
-
-Если необходимо прикрепить дополнительные ссылки, просто добавьте их в свой Google Docs.
-
-Перед тем как выслать ссылку, убедитесь, что ее содержимое не является приватным (открыто на комментирование всем, у кого есть ссылка), иначе преподаватель не сможет проверить работу. Чтобы это проверить, откройте ссылку в браузере в режиме инкогнито.
-
-[Как предоставить доступ к файлам и папкам на Google Диске](https://support.google.com/docs/answer/2494822?hl=ru&co=GENIE.Platform%3DDesktop)
-
-[Как запустить chrome в режиме инкогнито ](https://support.google.com/chrome/answer/95464?co=GENIE.Platform%3DDesktop&hl=ru)
-
-[Как запустить  Safari в режиме инкогнито ](https://support.apple.com/ru-ru/guide/safari/ibrw1069/mac)
-
-Любые вопросы по решению задач задавайте в чате Slack.
-
----
