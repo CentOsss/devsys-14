@@ -1,17 +1,7 @@
 #!/bin/bash
 
 ##script automatic data backup and notification on Telegram
-#backup 1C base pryan1c
-#pryan1c_false="PROBPLEM:pryan1c_dt:$(date)"
-#cp -rn /mnt/backups/pryan1c/ /mnt/raid/winbackups 
-#find /mnt/raid/winbackups/pryan1c -mindepth 1 -cmin 1  | wc -l > /tmp/pryan1c_dump.log
-#find /mnt/raid/winbackups/pryan1c -mindepth 1 -cmin 1  | mail os@tort.spb.ru
-#read RESULT1C < /tmp/pryan1c_dump.log
-#if [[ $RESULT1C = 0 ]]
-#then
-#curl -s -X POST "https://api.telegram.org/bot754293227:AAHSLoC8B-epHHt6dUeo9_m_hDWPlBalj78/sendMessage" -F chat_id=491455655 -F text=$pryan1c_false
-#curl -s -X POST "https://api.telegram.org/bot754293227:AAHSLoC8B-epHHt6dUeo9_m_hDWPlBalj78/sendMessage" -F chat_id=157914816 -F text=$pryan1c_false
-#fi
+API=
 
 infra_DB_false="PROBPLEM:infra_DB:$(date)"
 cp -rn /mnt/backups/servicedesk/ /mnt/raid/winbackups
@@ -20,14 +10,9 @@ find /mnt/raid/winbackups/servicedesk -mindepth 1 -cmin 1  | mail os@tort.spb.ru
 read RESULT1C < /tmp/pryan1c_dump.log
 if [[ $RESULT1C = 0 ]]
 then
-curl -s -X POST "https://api.telegram.org/bot754293227:AAHSLoC8B-epHHt6dUeo9_m_hDWPlBalj78/sendMessage" -F chat_id=491455655 -F text=$infra_DB_false
-curl -s -X POST "https://api.telegram.org/bot754293227:AAHSLoC8B-epHHt6dUeo9_m_hDWPlBalj78/sendMessage" -F chat_id=157914816 -F text=$infra_DB_false
+curl -s -X POST "https://api.telegram.org/bot$API/sendMessage" -F chat_id=491455655 -F text=$infra_DB_false
+curl -s -X POST "https://api.telegram.org/bot$API/sendMessage" -F chat_id=157914816 -F text=$infra_DB_false
 fi
-
-
-
-
-
 
 
 #jobs for copy mysqldump
@@ -38,8 +23,8 @@ find /mnt/raid/winbackups/sever-metropol.site/ -mindepth 1 -cmin 1  | mail os@to
 read RESULTDUMP < /tmp/mysql_dump.log
 if [[ $RESULTDUMP = 0 ]]
 then
-curl -s -X POST "https://api.telegram.org/bot754293227:AAHSLoC8B-epHHt6dUeo9_m_hDWPlBalj78/sendMessage" -F chat_id=491455655 -F text=$dump_false
-curl -s -X POST "https://api.telegram.org/bot754293227:AAHSLoC8B-epHHt6dUeo9_m_hDWPlBalj78/sendMessage" -F chat_id=157914816 -F text=$dump_false
+curl -s -X POST "https://api.telegram.org/bot$API/sendMessage" -F chat_id=491455655 -F text=$dump_false
+curl -s -X POST "https://api.telegram.org/bot$API/sendMessage" -F chat_id=157914816 -F text=$dump_false
 fi
 
 
@@ -52,8 +37,8 @@ find /mnt/raid/winbackups/sever-metropol.site/ -mindepth 1 -cmin 1  | mail os@to
 read RESULTSITE < /tmp/site_dump.log
 if [[ $RESULTDUMP = 0 ]]
 then
-curl -s -X POST "https://api.telegram.org/bot754293227:AAHSLoC8B-epHHt6dUeo9_m_hDWPlBalj78/sendMessage" -F chat_id=491455655 -F text=$site_false
-curl -s -X POST "https://api.telegram.org/bot754293227:AAHSLoC8B-epHHt6dUeo9_m_hDWPlBalj78/sendMessage" -F chat_id=157914816 -F text=$site_false
+curl -s -X POST "https://api.telegram.org/bot$API/sendMessage" -F chat_id=491455655 -F text=$site_false
+curl -s -X POST "https://api.telegram.org/bot$API/sendMessage" -F chat_id=157914816 -F text=$site_false
 fi
 
 
