@@ -7,6 +7,7 @@ volumes:
   pg_backup:
 
 services:
+  name: 'node01.db.cloud'
   pg_db:
     image: postgres:12
     restart: always
