@@ -9,6 +9,32 @@
 
 Используя docker поднимите инстанс MySQL (версию 8). Данные БД сохраните в volume.
 
+```
+version: '3.1'
+
+volumes:
+  mysql_db: {}
+  mysql_backup: { }
+
+services:
+
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: test
+    volumes:
+      - mysql_db:/var/lib/mysql
+      - mysql_backup:/backup
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+```
+
 Изучите [бэкап БД](https://github.com/netology-code/virt-homeworks/tree/master/06-db-03-mysql/test_data) и 
 восстановитесь из него.
 
@@ -47,7 +73,30 @@ Threads: 2  Questions: 6  Slow queries: 0  Opens: 136  Flush tables: 3  Open tab
 
 Подключитесь к восстановленной БД и получите список таблиц из этой БД.
 
+```
+mysql> show tables;
++-------------------+
+| Tables_in_test_db |
++-------------------+
+| orders            |
++-------------------+
+1 row in set (0.00 sec)
+
+
+```
+
 **Приведите в ответе** количество записей с `price` > 300.
+
+```
+mysql> select count(*) from orders where price >300;
++----------+
+| count(*) |
++----------+
+|        1 |
++----------+
+1 row in set (0.00 sec)
+
+```
 
 В следующих заданиях мы будем продолжать работу с данным контейнером.
 
@@ -62,10 +111,38 @@ Threads: 2  Questions: 6  Slow queries: 0  Opens: 136  Flush tables: 3  Open tab
     - Фамилия "Pretty"
     - Имя "James"
 
+```
+CREATE USER 'test'@'localhost' IDENTIFIED BY 'test-pass';
+ALTER USER 'test'@'localhost' ATTRIBUTE '{"fname":"James", "lname":"Pretty"}';
+
+mysql> alter user 'test'@'localhost'
+    ->  IDENTIFIED BY 'test-pass'
+    -> WITH
+    -> MAX_QUERIES_PER_HOUR 100
+    -> PASSWORD EXPIRE INTERVAL 180 DAY
+    ->  FAILED_LOGIN_ATTEMPTS 3 PASSWORD_LOCK_TIME 2;
+Query OK, 0 rows affected (0.00 sec)
+
+```
 Предоставьте привелегии пользователю `test` на операции SELECT базы `test_db`.
+
+```
+GRANT Select ON test_db.orders TO 'test'@'localhost';
+```
     
 Используя таблицу INFORMATION_SCHEMA.USER_ATTRIBUTES получите данные по пользователю `test` и 
 **приведите в ответе к задаче**.
+```
+SELECT * FROM INFORMATION_SCHEMA.USER_ATTRIBUTES WHERE USER='test';
+
++------+-----------+---------------------------------------+
+| USER | HOST      | ATTRIBUTE                             |
++------+-----------+---------------------------------------+
+| test | localhost | {"fname": "James", "lname": "Pretty"} |
++------+-----------+---------------------------------------+
+1 row in set (0.00 sec)
+
+```
 
 ## Задача 3
 
@@ -77,6 +154,34 @@ Threads: 2  Questions: 6  Slow queries: 0  Opens: 136  Flush tables: 3  Open tab
 Измените `engine` и **приведите время выполнения и запрос на изменения из профайлера в ответе**:
 - на `MyISAM`
 - на `InnoDB`
+
+```
+SELECT TABLE_NAME,ENGINE,ROW_FORMAT,TABLE_ROWS,DATA_LENGTH,INDEX_LENGTH FROM information_schema.TABLES WHERE table_name = 'orders' and  TABLE_SCHEMA = 'test_db' ORDER BY ENGINE asc;
+
++------------+--------+------------+------------+-------------+--------------+
+| TABLE_NAME | ENGINE | ROW_FORMAT | TABLE_ROWS | DATA_LENGTH | INDEX_LENGTH |
++------------+--------+------------+------------+-------------+--------------+
+| orders     | InnoDB | Dynamic    |          5 |       16384 |            0 |
++------------+--------+------------+------------+-------------+--------------+
+
+mysql> ALTER TABLE orders ENGINE = MyISAM;
+Query OK, 5 rows affected (1.17 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE orders ENGINE = InnoDB;
+Query OK, 5 rows affected (1.37 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> show profiles;
++----------+------------+------------------------------------+
+| Query_ID | Duration   | Query                              |
++----------+------------+------------------------------------+
+|        1 | 0.00013225 | show prifiles                      |
+|        2 | 1.17695100 | ALTER TABLE orders ENGINE = MyISAM |
+|        3 | 1.36970325 | ALTER TABLE orders ENGINE = InnoDB |
++----------+------------+------------------------------------+
+3 rows in set, 1 warning (0.00 sec)
+```
 
 ## Задача 4 
 
@@ -90,6 +195,26 @@ Threads: 2  Questions: 6  Slow queries: 0  Opens: 136  Flush tables: 3  Open tab
 - Размер файла логов операций 100 Мб
 
 Приведите в ответе измененный файл `my.cnf`.
+
+```
+
+#Set IO Speed
+innodb_flush_log_at_trx_commit = 0 
+
+#Set compression
+innodb_file_format=Barracuda
+
+#Set buffer
+innodb_log_buffer_size	= 1M
+
+#Set Cache size
+key_buffer_size = 1228М
+
+#Set log size
+max_binlog_size	= 100M
+
+
+```
 
 ---
 
