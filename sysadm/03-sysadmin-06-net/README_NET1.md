@@ -45,8 +45,8 @@ Time 198 ms
 
 - приложите скриншот консоли браузера в ответ.
 
-<p align="center">
-  <img width="1200" height="600" src="./f12.png">
+<p align="left">
+  <img width="777" height="965" src="./f12.png">
 </p>
 
 3. Какой IP адрес у вас в интернете?
