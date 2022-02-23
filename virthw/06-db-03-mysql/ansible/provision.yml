@@ -53,8 +53,8 @@
 
       - name: Synchronization
         copy:
-          src: test_data/
-          dest: "/opt/backup/"
+          src: stack/
+          dest: "/opt/stack/"
           owner: root
           group: root
           mode: 0644
