@@ -45,7 +45,7 @@ Time 198 ms
 
 - приложите скриншот консоли браузера в ответ.
 
-<p align="center">
+<p align="left">
   <img width="777" height="965" src="./f12.png">
 </p>
 
