@@ -18,6 +18,33 @@
 
 Найдите команду для выдачи статуса БД и **приведите в ответе** из ее вывода версию сервера БД.
 
+```
+mysql> \s
+--------------
+mysql  Ver 8.0.28 for Linux on x86_64 (MySQL Community Server - GPL)
+
+Connection id:          8
+Current database:
+Current user:           root@localhost
+SSL:                    Not in use
+Current pager:          stdout
+Using outfile:          ''
+Using delimiter:        ;
+Server version:         8.0.28 MySQL Community Server - GPL
+Protocol version:       10
+Connection:             Localhost via UNIX socket
+Server characterset:    utf8mb4
+Db     characterset:    utf8mb4
+Client characterset:    latin1
+Conn.  characterset:    latin1
+UNIX socket:            /var/run/mysqld/mysqld.sock
+Binary data as:         Hexadecimal
+Uptime:                 6 min 30 sec
+
+Threads: 2  Questions: 6  Slow queries: 0  Opens: 136  Flush tables: 3  Open tables: 55  Queries per second avg: 0.015
+
+```
+
 Подключитесь к восстановленной БД и получите список таблиц из этой БД.
 
 **Приведите в ответе** количество записей с `price` > 300.
