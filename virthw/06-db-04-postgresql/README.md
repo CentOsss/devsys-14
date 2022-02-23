@@ -4,6 +4,31 @@
 
 Используя docker поднимите инстанс PostgreSQL (версию 13). Данные БД сохраните в volume.
 
+```
+
+version: '3.1'
+
+
+volumes:
+  pg_db: {}
+  pg_backup: { }
+
+services:
+  pg_db:
+    image: postgres:13
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - pg_db:/var/lib/postgresql/data
+      - pg_backup:  /var/lib/postgresql/backup
+    ports:
+      - ${POSTGRES_PORT:-5432}:5432
+
+```
+
 Подключитесь к БД PostgreSQL используя `psql`.
 
 Воспользуйтесь командой `\?` для вывода подсказки по имеющимся в `psql` управляющим командам.
