@@ -27,15 +27,8 @@ Vagrant 2.2.14
 
 4. С помощью базового файла конфигурации запустите Ubuntu 20.04 в VirtualBox посредством Vagrant:
 
-	* Создайте директорию, в которой будут храниться конфигурационные файлы Vagrant. В ней выполните `vagrant init`. Замените содержимое Vagrantfile по умолчанию следующим:
-
-		```bash
-		Vagrant.configure("2") do |config|
-			config.vm.box = "bento/ubuntu-20.04"
-		end
-		```
 ```
-
+Немного переделал базовой файл для использования в бдущем.
 Поднял VM с CentOS и развернул в ней PostgreSQL инстанс:
 
 Vagrant.configure("2") do |config|
@@ -61,7 +54,6 @@ Vagrant.configure("2") do |config|
     yum install -y ssh sudo
     useradd -m -s /bin/bash admin
     echo 'admin:admin' | chpasswd
-    #adduser onetrix sudo
     echo 'admin   ALL=NOPASSWD: ALL' >> /etc/sudoers
     sudo localedef -i ru_RU -f UTF-8 ru_RU.UTF-8
     sudo localectl set-locale LANG=ru_RU.utf8
@@ -91,7 +83,7 @@ PS V:\vm\vagrant\ubuntu> C:\HashiCorp\Vagrant\bin\vagrant.exe suspend
 
 6. Ознакомьтесь с возможностями конфигурации VirtualBox через Vagrantfile: [документация](https://www.vagrantup.com/docs/providers/virtualbox/configuration.html). Как добавить оперативной памяти или ресурсов процессора виртуальной машине?
 ```
-В файле провижинга можно указать параметры (к примеру):
+Можно задать параметры таким образом:
     hv.cpus = 10
     hv.memory = 32768
 ```
@@ -101,25 +93,27 @@ PS V:\vm\vagrant\ubuntu> C:\HashiCorp\Vagrant\bin\vagrant.exe suspend
 ```
 PS V:\vm\vagrant\ubuntu> C:\HashiCorp\Vagrant\bin\vagrant.exe ssh
 Last login: Fri Feb 25 03:20:01 2022 from 172.16.13.101
-[vagrant@localhost ~]$
+[vagrant@localhost ~]$ 
+Попрактиковался.
+
 ```
 
 8. Ознакомиться с разделами `man bash`, почитать о настройках самого bash:
     * какой переменной можно задать длину журнала `history`, и на какой строчке manual это описывается?
-   
+     что делает директива `ignoreboth` в bash?
+
 ```
 HISTSIZE
  Manual page bash(1) line 692 
 ```
-    
-    что делает директива `ignoreboth` в bash?
+```
+Директива `ignoreboth позволяет не сохранять в истории дупликаты команд 
+```
+
+9. В каких сценариях использования применимы скобки `{}` и на какой строчке `man bash` это описано?
 
 ```
-Не хранито в истории дупликаты команд и команды начинающиеся с пробела
-```
-9. В каких сценариях использования применимы скобки `{}` и на какой строчке `man bash` это описано?
-```
-чикличное выполнение команд в текущей сессии  (не порождает дочерний процесс )
+Цикличное выполнение команд в текущей сессии  (не порождает дочерний процесс )
 ```
 
 10. Основываясь на предыдущем вопросе, как создать однократным вызовом `touch` 100000 файлов? А получилось ли создать 300000? Если нет, то почему?
