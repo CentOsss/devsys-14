@@ -38,7 +38,34 @@ Paths: (23 available, best #22, table default)
 2. Создайте dummy0 интерфейс в Ubuntu. Добавьте несколько статических маршрутов. Проверьте таблицу маршрутизации.
 
 ```
+Подгружаем модуль.
+root@DBIT:~# echo "dummy" >> /etc/modules && echo "options dummy numdummies=2" > /etc/modprobe.d/dummy.conf
 
+# создаем интерфейс dummy.
+root@DBIT:~# vi /etc/network/interfaces
+
+auto dummy0
+iface dummy0 inet static
+ address 10.4.4.4/32
+ pre-up ip link add dummy0 type dummy
+ post-down ip link del dummy0
+
+# перезапускаем сеть и проверяем поднялся ли интерфейс
+root@DBIT:~# systemctl restart networking.service
+root@DBIT:~# ip link set dummy0 up
+
+# Добавляем несколько статических маршрутов через созданный интерфейс
+root@DBIT:~# ip route add 100.64.0.0/10 via 10.4.4.4
+root@DBIT:~# ip route add 100.100.0.0/29 dev dummy0
+
+# Проверяем таблицу маршрутизации
+root@DBIT:~# ip -br route
+default via 172.16.0.1 dev eth0 onlink
+100.64.0.0/10 via 10.4.4.4 dev dummy0
+100.100.0.0/29 dev dummy0 scope link
+172.16.0.0/16 dev eth0 proto kernel scope link src 172.16.0.200
+172.30.0.0/16 dev docker0 proto kernel scope link src 172.30.0.1
+192.168.123.0/24 dev virbr0 proto kernel scope link src 192.168.123.1 linkdown
 
 ```
 
