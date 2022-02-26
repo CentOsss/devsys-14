@@ -69,7 +69,7 @@ udp        0      0 192.168.123.1:53        0.0.0.0:*
 
 5. Используя diagrams.net, создайте L3 диаграмму вашей домашней сети или любой другой сети, с которой вы работали. 
 
-https://skrinshoter.ru/p/260222/BWItNL.png?download=1&name=%D0%A1%D0%BA%D1%80%D0%B8%D0%BD%D1%88%D0%BE%D1%82%2026-02-2022%2020:45:47.png
+![l3](https://github.com/CentOsss/devsys-14/tree/main/sysadm/03-sysadmin-08-net/image.png)
 
  ---
 ## Задание для самостоятельной отработки (необязательно к выполнению)
