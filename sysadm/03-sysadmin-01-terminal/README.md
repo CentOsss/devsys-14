@@ -3,8 +3,8 @@
 1. Установите средство виртуализации [Oracle VirtualBox](https://www.virtualbox.org/).
 
 ```
-Для выполнения лаборотрной работы планируюи использовать гипервизор Hyper-V Core 2019. 
-С функционалом VirtualBOX знаком давно. Не инересен.
+Для выполнения лаборотрной работы планирую использовать гипервизор Hyper-V Core 2019. 
+С функционалом VirtualBOX знаком.
 ```
 
 2. Установите средство автоматизации [Hashicorp Vagrant](https://www.vagrantup.com/).
@@ -28,8 +28,8 @@ Vagrant 2.2.14
 4. С помощью базового файла конфигурации запустите Ubuntu 20.04 в VirtualBox посредством Vagrant:
 
 ```
-Немного переделал базовой файл для использования в бдущем.
-Поднял VM с CentOS и развернул в ней PostgreSQL инстанс:
+Немного переделал базовой файл для использования в бдущем на лаболаторных стендах.
+Развернута VM CentOS 7 и PostgreSQL инстанс:
 
 Vagrant.configure("2") do |config|
   config.vm.provider :hyperv do |hv|
@@ -46,10 +46,7 @@ Vagrant.configure("2") do |config|
     echo "Europe/Moscow" > /etc/timezone
     echo "PATH=/usr/bin/:/opt/pgpro/1c-14/bin/" >> /etc/environment
     ln -fs /usr/share/zoneinfo/Europe/Moscow /etc/localtime
-    echo "1csrv03.nord.ru" > /etc/hostname
-    setenforce 0
-    systemctl stop firewalld
-    systemctl disable firewalld
+    systemctl stop firewalld && systemctl disable firewalld
     yum update
     yum install -y ssh sudo
     useradd -m -s /bin/bash admin
@@ -66,14 +63,6 @@ Vagrant.configure("2") do |config|
   SHELL
 end
 ```
-
-```
-PS V:\vm\vagrant\ubuntu> C:\HashiCorp\Vagrant\bin\vagrant.exe suspend
-==> default: Suspending the machine...
-
-```
-
-
 
 5. Ознакомьтесь с графическим интерфейсом VirtualBox, посмотрите как выглядит виртуальная машина, которую создал для вас Vagrant, какие аппаратные ресурсы ей выделены. Какие ресурсы выделены по-умолчанию?
 
@@ -94,7 +83,7 @@ PS V:\vm\vagrant\ubuntu> C:\HashiCorp\Vagrant\bin\vagrant.exe suspend
 PS V:\vm\vagrant\ubuntu> C:\HashiCorp\Vagrant\bin\vagrant.exe ssh
 Last login: Fri Feb 25 03:20:01 2022 from 172.16.13.101
 [vagrant@localhost ~]$ 
-Попрактиковался.
+Попрактиковался с различным набором команд.
 
 ```
 
@@ -103,24 +92,27 @@ Last login: Fri Feb 25 03:20:01 2022 from 172.16.13.101
      что делает директива `ignoreboth` в bash?
 
 ```
-HISTSIZE
- Manual page bash(1) line 692 
+HISTFILESIZE
+ Manual page bash(1) line 609 
 ```
 ```
-Директива `ignoreboth позволяет не сохранять в истории дупликаты команд 
+Директива `ignoreboth (сокращенная запись ignorespace и ignoredups)  приводит к тому, что строки, совпадающие с предыдущей записью истории, не сохраняются, а также не сохраняютя команды начинающиеся с пробела
 ```
 
 9. В каких сценариях использования применимы скобки `{}` и на какой строчке `man bash` это описано?
 
 ```
-Цикличное выполнение команд в текущей сессии  (не порождает дочерний процесс )
+Это втроенные команды коммандного интерепретатора. В таких скобках команды будут выполняться циклично.Такие скобки применимы в фукциях которые необходимо выполнить в окружении текущего интерпретатора. Команды выполняемые в таких фигурных скобках имеют доступ ко всем переменным системного окружения запустившего их шелла. И могут (влиять) возвращать результат в текущее окружение. Цикличное выполнение команд в текущей сессии  (не порождает дочерний процесс )
 ```
 
-10. Основываясь на предыдущем вопросе, как создать однократным вызовом `touch` 100000 файлов? А получилось ли создать 300000? Если нет, то почему?
+10. Основываясь на предыдущем вопросе, как создать однократным вызовом `touch` 100000 файлов? А получилось ли создать 300000 файлов н Если нет, то почему?
 
 ```
+Создать однократным вызовом `touch` 100000 файлов можно так: 
+
 touch {1..100000}
-Не получится. Ограничение на максимальное кол-уо открытых файлов процессом
+
+Создать 300000 файлов не получится, т.к. в системе есть ограничение на максимальное кол-во открытых файлов процессом
 ```
 11. В man bash поищите по `/\[\[`. Что делает конструкция `[[ -d /tmp ]]`
 ```
@@ -138,25 +130,22 @@ touch {1..100000}
     В качестве ответа приведите команды, которые позволили вам добиться указанного вывода или соответствующие скриншоты.
 
 ```
-vagrant@localhost:~$ mkdir /tmp/new_path_dir/
-vagrant@localhost:~$ cp /bin/bash /tmp/new_path_dir/
-vagrant@localhost:~$ type -a bash
-bash is /usr/bin/bash
-bash is /bin/bash
-vagrant@localhost:~$ PATH=/tmp/new_path_dir/:$PATH
+vagrant@localhost:~$ PATH=/tmp/new_path_directory/:$PATH
 vagrant@localhost:~$ type -a bash
 bash is /tmp/new_path_dir/bash
 bash is /usr/bin/bash
-bash is /bin/bash
   
 ```
 13. Чем отличается планирование команд с помощью `batch` и `at`?
 ```
-at запускается в указанное время, a batch - выполняет команды, когда уровень нагрузки на систему это позволяет
+at запускается по заданному расписанию в указанное время, a batch - выполняет команды, когда уровень нагрузки на систему это позволяет, соглсано заданным условиям 
 ```
 14. Завершите работу виртуальной машины чтобы не расходовать ресурсы компьютера и/или батарею ноутбука.
 
 ```
+PS V:\vm\vagrant\ubuntu> C:\HashiCorp\Vagrant\bin\vagrant.exe halt
+
+
 PS V:\vm\vagrant\ubuntu> C:\HashiCorp\Vagrant\bin\vagrant.exe destroy
     default: Are you sure you want to destroy the 'default' VM? [y/N] y
 ==> default: Stopping the machine...
