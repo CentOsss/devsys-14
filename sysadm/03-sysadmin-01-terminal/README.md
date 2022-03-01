@@ -3,44 +3,33 @@
 1. Установите средство виртуализации [Oracle VirtualBox](https://www.virtualbox.org/).
 
 ```
-Развернул Vagrant  на своем лабароторном стенде под управлением Hyper-V Core 2019: 
+Для выполнения лаборотрной работы планирую использовать гипервизор Hyper-V Core 2019. 
+С функционалом VirtualBOX знаком.
 ```
 
-1. Установите средство автоматизации [Hashicorp Vagrant](https://www.vagrantup.com/).
+2. Установите средство автоматизации [Hashicorp Vagrant](https://www.vagrantup.com/).
 
 ```
-PS V:\vm\vagrant\ubuntu> C:\HashiCorp\Vagrant\bin\vagrant.exe --version
+PS V:\vm\vagrant\ubuntu> vagrant.exe --version
 Vagrant 2.2.14
 ```
 
-1. В вашем основном окружении подготовьте удобный для дальнейшей работы терминал. Можно предложить:
+3. В вашем основном окружении подготовьте удобный для дальнейшей работы терминал. Можно предложить:
+
 
 	* iTerm2 в Mac OS X
 	* Windows Terminal в Windows
 	* выбрать цветовую схему, размер окна, шрифтов и т.д.
 	* почитать о кастомизации PS1/применить при желании.
-
-	Несколько популярных проблем:
-	* Добавьте Vagrant в правила исключения перехватывающих трафик для анализа антивирусов, таких как Kaspersky, если у вас возникают связанные с SSL/TLS ошибки,
-	* MobaXterm может конфликтовать с Vagrant в Windows,
-	* Vagrant плохо работает с директориями с кириллицей (может быть вашей домашней директорией), тогда можно либо изменить [VAGRANT_HOME](https://www.vagrantup.com/docs/other/environmental-variables#vagrant_home), либо создать в системе профиль пользователя с английским именем,
-	* VirtualBox конфликтует с Windows Hyper-V и его необходимо [отключить](https://www.vagrantup.com/docs/installation#windows-virtualbox-and-hyper-v),
-	* [WSL2](https://docs.microsoft.com/ru-ru/windows/wsl/wsl2-faq#does-wsl-2-use-hyper-v-will-it-be-available-on-windows-10-home) использует Hyper-V, поэтому с ним VirtualBox также несовместим,
-	* аппаратная виртуализация (Intel VT-x, AMD-V) должна быть активна в BIOS,
-	* в Linux при установке [VirtualBox](https://www.virtualbox.org/wiki/Linux_Downloads) может дополнительно потребоваться пакет `linux-headers-generic` (debian-based) / `kernel-devel` (rhel-based).
-
-1. С помощью базового файла конфигурации запустите Ubuntu 20.04 в VirtualBox посредством Vagrant:
-
-	* Создайте директорию, в которой будут храниться конфигурационные файлы Vagrant. В ней выполните `vagrant init`. Замените содержимое Vagrantfile по умолчанию следующим:
-
-		```bash
-		Vagrant.configure("2") do |config|
-			config.vm.box = "bento/ubuntu-20.04"
-		end
-		```
+```
+Очень хорошо себя зарекомендовал в работе терминальный клиент MobaXterm
 ```
 
-Поднял VM с CentOS и развернул в ней PostgreSQL инстанс:
+4. С помощью базового файла конфигурации запустите Ubuntu 20.04 в VirtualBox посредством Vagrant:
+
+```
+Немного переделал базовой файл для использования в бдущем на лаболаторных стендах.
+Развернута VM CentOS 7 и PostgreSQL инстанс:
 
 Vagrant.configure("2") do |config|
   config.vm.provider :hyperv do |hv|
@@ -57,15 +46,11 @@ Vagrant.configure("2") do |config|
     echo "Europe/Moscow" > /etc/timezone
     echo "PATH=/usr/bin/:/opt/pgpro/1c-14/bin/" >> /etc/environment
     ln -fs /usr/share/zoneinfo/Europe/Moscow /etc/localtime
-    echo "1csrv03.nord.ru" > /etc/hostname
-    setenforce 0
-    systemctl stop firewalld
-    systemctl disable firewalld
+    systemctl stop firewalld && systemctl disable firewalld
     yum update
     yum install -y ssh sudo
     useradd -m -s /bin/bash admin
     echo 'admin:admin' | chpasswd
-    #adduser onetrix sudo
     echo 'admin   ALL=NOPASSWD: ALL' >> /etc/sudoers
     sudo localedef -i ru_RU -f UTF-8 ru_RU.UTF-8
     sudo localectl set-locale LANG=ru_RU.utf8
@@ -79,64 +64,66 @@ Vagrant.configure("2") do |config|
 end
 ```
 
-```
-PS V:\vm\vagrant\ubuntu> C:\HashiCorp\Vagrant\bin\vagrant.exe suspend
-==> default: Suspending the machine...
-
-```
-
-
-
-1. Ознакомьтесь с графическим интерфейсом VirtualBox, посмотрите как выглядит виртуальная машина, которую создал для вас Vagrant, какие аппаратные ресурсы ей выделены. Какие ресурсы выделены по-умолчанию?
+5. Ознакомьтесь с графическим интерфейсом VirtualBox, посмотрите как выглядит виртуальная машина, которую создал для вас Vagrant, какие аппаратные ресурсы ей выделены. Какие ресурсы выделены по-умолчанию?
 
 ```
 По умолчяанию выделяется 1GB RAM и 1 виртуальный процессор
 ```
 
-1. Ознакомьтесь с возможностями конфигурации VirtualBox через Vagrantfile: [документация](https://www.vagrantup.com/docs/providers/virtualbox/configuration.html). Как добавить оперативной памяти или ресурсов процессора виртуальной машине?
+6. Ознакомьтесь с возможностями конфигурации VirtualBox через Vagrantfile: [документация](https://www.vagrantup.com/docs/providers/virtualbox/configuration.html). Как добавить оперативной памяти или ресурсов процессора виртуальной машине?
 ```
-В файле провижинга можно указать параметры (к примеру):
+Можно задать параметры таким образом:
     hv.cpus = 10
     hv.memory = 32768
 ```
 
-1. Команда `vagrant ssh` из директории, в которой содержится Vagrantfile, позволит вам оказаться внутри виртуальной машины без каких-либо дополнительных настроек. Попрактикуйтесь в выполнении обсуждаемых команд в терминале Ubuntu.
+7. Команда `vagrant ssh` из директории, в которой содержится Vagrantfile, позволит вам оказаться внутри виртуальной машины без каких-либо дополнительных настроек. Попрактикуйтесь в выполнении обсуждаемых команд в терминале Ubuntu.
 
 ```
 PS V:\vm\vagrant\ubuntu> C:\HashiCorp\Vagrant\bin\vagrant.exe ssh
 Last login: Fri Feb 25 03:20:01 2022 from 172.16.13.101
-[vagrant@localhost ~]$
+[vagrant@localhost ~]$ 
+Попрактиковался с различным набором команд.
+
 ```
 
-1. Ознакомиться с разделами `man bash`, почитать о настройках самого bash:
+8. Ознакомиться с разделами `man bash`, почитать о настройках самого bash:
     * какой переменной можно задать длину журнала `history`, и на какой строчке manual это описывается?
-   
-```
-HISTSIZE
- Manual page bash(1) line 692 
-```
-    
-    что делает директива `ignoreboth` в bash?
+     что делает директива `ignoreboth` в bash?
 
 ```
-Не хранито в истории дупликаты команд и команды начинающиеся с пробела
+HISTFILESIZE
+ Manual page bash(1) line 609 
 ```
-1. В каких сценариях использования применимы скобки `{}` и на какой строчке `man bash` это описано?
 ```
-чикличное выполнение команд в текущей сессии  (не порождает дочерний процесс )
+Директива `ignoreboth (сокращенная запись ignorespace и ignoredups)  приводит к тому, что строки,  
+совпадающие с предыдущей записью истории, не сохраняются, а также не сохраняютя команды начинающиеся с пробела
 ```
 
-1. Основываясь на предыдущем вопросе, как создать однократным вызовом `touch` 100000 файлов? А получилось ли создать 300000? Если нет, то почему?
+9. В каких сценариях использования применимы скобки `{}` и на какой строчке `man bash` это описано?
 
 ```
+Это втроенные команды коммандного интерепретатора. В таких скобках команды будут выполняться циклично.  
+Такие скобки применимы в фукциях которые необходимо выполнить в окружении текущего интерпретатора.   
+Команды выполняемые в таких фигурных скобках имеют доступ ко всем переменным системного окружения   
+запустившего их шелла. И могут (влиять) возвращать результат в текущее окружение. Цикличное выполнение  
+команд в текущей сессии  (не порождает дочерний процесс )
+```
+
+10. Основываясь на предыдущем вопросе, как создать однократным вызовом `touch` 100000 файлов? А получилось ли создать 300000 файлов н Если нет, то почему?
+
+```
+Создать однократным вызовом `touch` 100000 файлов можно так: 
+
 touch {1..100000}
-Не получится. Ограничение на максимальное кол-уо открытых файлов процессом
+
+Создать 300000 файлов не получится, т.к. в системе есть ограничение на максимальное кол-во открытых файлов процессом
 ```
-1. В man bash поищите по `/\[\[`. Что делает конструкция `[[ -d /tmp ]]`
+11. В man bash поищите по `/\[\[`. Что делает конструкция `[[ -d /tmp ]]`
 ```
 Проверка условия. В данном случае проверяется наличие директории /tmp и возращается  результат 0 или 1 
 ```
-1. Основываясь на знаниях о просмотре текущих (например, PATH) и установке новых переменных; командах, которые мы рассматривали, добейтесь в выводе type -a bash в виртуальной машине наличия первым пунктом в списке:
+12. Основываясь на знаниях о просмотре текущих (например, PATH) и установке новых переменных; командах, которые мы рассматривали, добейтесь в выводе type -a bash в виртуальной машине наличия первым пунктом в списке:
 
 	```bash
 	bash is /tmp/new_path_directory/bash
@@ -148,25 +135,23 @@ touch {1..100000}
     В качестве ответа приведите команды, которые позволили вам добиться указанного вывода или соответствующие скриншоты.
 
 ```
-vagrant@localhost:~$ mkdir /tmp/new_path_dir/
-vagrant@localhost:~$ cp /bin/bash /tmp/new_path_dir/
-vagrant@localhost:~$ type -a bash
-bash is /usr/bin/bash
-bash is /bin/bash
-vagrant@localhost:~$ PATH=/tmp/new_path_dir/:$PATH
+vagrant@localhost:~$ PATH=/tmp/new_path_directory/:$PATH
 vagrant@localhost:~$ type -a bash
 bash is /tmp/new_path_dir/bash
 bash is /usr/bin/bash
-bash is /bin/bash
   
 ```
-1. Чем отличается планирование команд с помощью `batch` и `at`?
+13. Чем отличается планирование команд с помощью `batch` и `at`?
 ```
-at запускается в указанное время, a batch - выполняет команды, когда уровень нагрузки на систему это позволяет
+at запускается по заданному расписанию в указанное время, a batch - выполняет команды,  
+когда уровень нагрузки на систему это позволяет, соглсано заданным условиям 
 ```
-1. Завершите работу виртуальной машины чтобы не расходовать ресурсы компьютера и/или батарею ноутбука.
+14. Завершите работу виртуальной машины чтобы не расходовать ресурсы компьютера и/или батарею ноутбука.
 
 ```
+PS V:\vm\vagrant\ubuntu> C:\HashiCorp\Vagrant\bin\vagrant.exe halt
+
+
 PS V:\vm\vagrant\ubuntu> C:\HashiCorp\Vagrant\bin\vagrant.exe destroy
     default: Are you sure you want to destroy the 'default' VM? [y/N] y
 ==> default: Stopping the machine...
