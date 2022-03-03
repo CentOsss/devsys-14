@@ -2,3 +2,4 @@ node.name: netology_test
 network.host: 0.0.0.0
 path.data: /var/lib/data
 path.logs: /var/lib/logs
+path.repo: /usr/share/elasticsearch/snapshots
