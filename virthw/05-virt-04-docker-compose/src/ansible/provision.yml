@@ -53,18 +53,18 @@
 
       - name: Synchronization
         copy:
-          src: stack/
-          dest: "/opt/stack/"
+          src: sharedock/
+          dest: "/opt/sharedock/"
           owner: root
           group: root
           mode: 0644
         become: true
 
       - name: Pull all images in compose
-        command: docker-compose -f /opt/stack/docker-compose.yaml pull
+        command: docker-compose -f /opt/sharedock/docker-compose.yaml pull
 
       - name: Up all services in compose
-        command: docker-compose -f /opt/stack/docker-compose.yaml up -d
+        command: docker-compose -f /opt/sharedock/docker-compose.yaml up -d
 
   - hosts: nodes2
     become: yes
@@ -120,15 +120,15 @@
 
       - name: Synchronization
         copy:
-          src: stack/
-          dest: "/opt/stack/"
+          src: sharedock/
+          dest: "/opt/sharedock/"
           owner: root
           group: root
           mode: 0644
         become: true
 
       - name: Pull all images in compose
-        command: docker-compose -f /opt/stack/exporters/docker-compose.exporters.yaml pull
+        command: docker-compose -f /opt/sharedock/exporters/docker-compose.exporters.yaml pull
 
       - name: Up all services in compose
-        command: docker-compose -f /opt/stack/exporters/docker-compose.exporters.yaml up -d
+        command: docker-compose -f /opt/sharedock/exporters/docker-compose.exporters.yaml up -d

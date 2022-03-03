@@ -54,7 +54,7 @@
       - name: Synchronization
         copy:
           src: sharedock/
-          dest: "/opt/sharedock/"
+          dest: "/sharedock/"
           owner: root
           group: root
           mode: 0644
@@ -65,9 +65,3 @@
 
       - name: Up all services in compose
         command: docker-compose -f /opt/sharedock/docker-compose.yaml up -d
-
-      - name: Restore Dump
-        command: docker exec -i stack_pg_db_1 sh -c 'psql -U postgres -f /opt/sharedock/root_pg_backup/_data/test_db.dump postgres'
-
-
-

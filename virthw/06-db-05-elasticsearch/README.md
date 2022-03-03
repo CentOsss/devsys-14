@@ -20,8 +20,58 @@
 
 В ответе приведите:
 - текст Dockerfile манифеста
+```
+FROM centos:7
+
+RUN groupadd elasticsearch && \
+         useradd -g elasticsearch elasticsearch
+
+RUN yum install wget -y && \
+        wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-8.0.1-linux-x86_64.tar.gz && \
+        mkdir /usr/share/elasticsearch/ /var/lib/logs /var/lib/data && \
+        tar -xf elasticsearch-8.0.1-linux-x86_64.tar.gz -C /usr/share/elasticsearch --strip-components 1 && \
+        rm -f elasticsearch-8.0.1-linux-x86_64.tar.gz && \
+        chown -R elasticsearch:elasticsearch /usr/share/elasticsearch && \
+        chown elasticsearch:elasticsearch /var/lib/data /var/lib/logs
+
+EXPOSE 9200/tcp 9300/tcp
+
+USER elasticsearch
+
+ENV PATH=/usr/share/elasticsearch/bin:$PATH
+
+COPY . /usr/share/elasticsearch/config/
+
+WORKDIR /usr/share/elasticsearch/bin
+
+CMD ["elasticsearch"]
+```
 - ссылку на образ в репозитории dockerhub
+```
+https://hub.docker.com/repository/docker/nordit/elasticsearch
+```
 - ответ `elasticsearch` на запрос пути `/` в json виде
+
+```
+{
+  "name" : "netology_test",
+  "cluster_name" : "elasticsearch",
+  "cluster_uuid" : "BljPd-uxQ8CuUqGPtqgV5Q",
+  "version" : {
+    "number" : "8.0.1",
+    "build_flavor" : "default",
+    "build_type" : "tar",
+    "build_hash" : "801d9ccc7c2ee0f2cb121bbe22ab5af77a902372",
+    "build_date" : "2022-02-24T13:55:40.601285296Z",
+    "build_snapshot" : false,
+    "lucene_version" : "9.0.0",
+    "minimum_wire_compatibility_version" : "7.17.0",
+    "minimum_index_compatibility_version" : "7.0.0"
+  },
+  "tagline" : "You Know, for Search"
+}
+
+```
 
 Подсказки:
 - возможно вам понадобится установка пакета perl-Digest-SHA для корректной работы пакета shasum
