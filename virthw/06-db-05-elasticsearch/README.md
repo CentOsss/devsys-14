@@ -97,14 +97,122 @@ https://hub.docker.com/repository/docker/nordit/elasticsearch
 | ind-2 | 1 | 2 |
 | ind-3 | 2 | 4 |
 
+```
+curl -u elastic -k -X PUT https://localhost:9200/ind-3 -H 'Content-Type: application/json' -d '{"settings": {"number_of_shards": 4, "number_of_replicas": 2 } }'
+```
+
 Получите список индексов и их статусов, используя API и **приведите в ответе** на задание.
+
+```
+curl -k -u elastic -X GET 'https://localhost:9200/_cat/indices?v'
+
+health status index uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+green  open   ind-1 arTBp5-QRmO_bmee4z9wbg   1   0          0            0       225b           225b
+yellow open   ind-3 JpaB3hCbQ8Cp8V6R3e2hAg   4   2          0            0       900b           900b
+yellow open   ind-2 hAOEGgqFRNqncGZOy5aIpg   2   1          0            0       450b           450b
+```
+```
+[root@ORO ~]# curl -u elastic -k -X GET 'https://localhost:9200/_cluster/health/ind-1?pretty'
+Enter host password for user 'elastic':
+{
+  "cluster_name" : "elasticsearch",
+  "status" : "green",
+  "timed_out" : false,
+  "number_of_nodes" : 1,
+  "number_of_data_nodes" : 1,
+  "active_primary_shards" : 1,
+  "active_shards" : 1,
+  "relocating_shards" : 0,
+  "initializing_shards" : 0,
+  "unassigned_shards" : 0,
+  "delayed_unassigned_shards" : 0,
+  "number_of_pending_tasks" : 0,
+  "number_of_in_flight_fetch" : 0,
+  "task_max_waiting_in_queue_millis" : 0,
+  "active_shards_percent_as_number" : 100.0
+}
+```
+```
+root@ORO ~]# curl -u elastic -k -X GET 'https://localhost:9200/_cluster/health/ind-2?pretty'
+Enter host password for user 'elastic':
+{
+  "cluster_name" : "elasticsearch",
+  "status" : "yellow",
+  "timed_out" : false,
+  "number_of_nodes" : 1,
+  "number_of_data_nodes" : 1,
+  "active_primary_shards" : 2,
+  "active_shards" : 2,
+  "relocating_shards" : 0,
+  "initializing_shards" : 0,
+  "unassigned_shards" : 2,
+  "delayed_unassigned_shards" : 0,
+  "number_of_pending_tasks" : 0,
+  "number_of_in_flight_fetch" : 0,
+  "task_max_waiting_in_queue_millis" : 0,
+  "active_shards_percent_as_number" : 47.368421052631575
+}
+```
+```
+[root@ORO ~]# curl -u elastic -k -X GET 'https://localhost:9200/_cluster/health/ind-3?pretty'
+Enter host password for user 'elastic':
+{
+  "cluster_name" : "elasticsearch",
+  "status" : "yellow",
+  "timed_out" : false,
+  "number_of_nodes" : 1,
+  "number_of_data_nodes" : 1,
+  "active_primary_shards" : 4,
+  "active_shards" : 4,
+  "relocating_shards" : 0,
+  "initializing_shards" : 0,
+  "unassigned_shards" : 8,
+  "delayed_unassigned_shards" : 0,
+  "number_of_pending_tasks" : 0,
+  "number_of_in_flight_fetch" : 0,
+  "task_max_waiting_in_queue_millis" : 0,
+  "active_shards_percent_as_number" : 47.368421052631575
+}
+
+```
 
 Получите состояние кластера `elasticsearch`, используя API.
 
+```
+[root@ORO ~]# curl -k -u elastic -X GET https://localhost:9200/_cluster/health/?pretty
+Enter host password for user 'elastic':
+{
+  "cluster_name" : "elasticsearch",
+  "status" : "yellow",
+  "timed_out" : false,
+  "number_of_nodes" : 1,
+  "number_of_data_nodes" : 1,
+  "active_primary_shards" : 9,
+  "active_shards" : 9,
+  "relocating_shards" : 0,
+  "initializing_shards" : 0,
+  "unassigned_shards" : 10,
+  "delayed_unassigned_shards" : 0,
+  "number_of_pending_tasks" : 0,
+  "number_of_in_flight_fetch" : 0,
+  "task_max_waiting_in_queue_millis" : 0,
+  "active_shards_percent_as_number" : 47.368421052631575
+}
+
+```
+
 Как вы думаете, почему часть индексов и кластер находится в состоянии yellow?
+
+```
+В данной конфигурации мы имеем всего лишь одну ноду в кластере. Шарды ind-2, ind-3 индексов не реплицированы и находятся в состоянии 
+в состоянии unassigned. При добавлении в кластер второй ноды и реплицировании шардов на нее статус кластера изменится на зеленый.
+```
 
 Удалите все индексы.
 
+```
+curl -k -u elastic -X DELETE https://localhost:9200/ind-1
+```
 **Важно**
 
 При проектировании кластера elasticsearch нужно корректно рассчитывать количество реплик и шард,

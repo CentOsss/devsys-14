@@ -36,7 +36,7 @@ docker run -d --log-driver local --log-opt max-size=50m --log-opt max-file=10 --
 
 ## set password 
 ```
-docker exec -ti $(docker ps ) sh -c '/usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic'
+docker exec -it $(docker ps ) sh -c '/usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic'
 4QujjqMz0fMOLe2OGBXe
 ```
 
@@ -45,4 +45,21 @@ docker exec -ti $(docker ps ) sh -c '/usr/share/elasticsearch/bin/elasticsearch-
 ```
 curl -k -u elastic  https://localhost:9200/ | jq
 ```
+## create index
+```
+curl -u elastic -k -v -X PUT https://localhost:9200/ind-2?pretty -H 'Content-Type: application/json' -d '{"settings": {"number_of_shards": 2, "number_of_replicas": 1 } }'
+```
 
+## list index
+```
+curl -k -u elastic -X GET 'https://localhost:9200/_cat/indices?v'
+```
+
+## status index
+```
+curl -u elastic -k -X GET 'https://localhost:9200/_cluster/health/ind-1?pretty'
+```
+
+
+0qkR9zAZJchuqtmIJAuY
+0qkR9zAZJchuqtmIJAuY
