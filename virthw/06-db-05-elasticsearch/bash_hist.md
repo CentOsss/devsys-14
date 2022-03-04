@@ -41,10 +41,6 @@ docker exec -it $(docker ps ) sh -c '/usr/share/elasticsearch/bin/elasticsearch-
 ```
 
 
-# Запрос
-```
-curl -k -u elastic  https://localhost:9200/ | jq
-```
 ## create index
 ```
 curl -u elastic -k -v -X PUT https://localhost:9200/ind-2?pretty -H 'Content-Type: application/json' -d '{"settings": {"number_of_shards": 2, "number_of_replicas": 1 } }'

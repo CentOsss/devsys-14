@@ -1,5 +1,10 @@
-node.name: netology_test
+cluster.name: nord
+node.name: $(HOSTNAME)
+node.roles: ["master", "data_hot", "data_content"]
 network.host: 0.0.0.0
-path.data: /var/lib/data
-path.logs: /var/lib/logs
-path.repo: /usr/share/elasticsearch/snapshots
+path.data: /var/lib/elasticsearch/data
+path.logs: /var/lib/elasticsearch/logs
+path.repo: /var/lib/elasticsearch/snapshots
+# КОЛИЧЕСТВО_КАНДИДАТОВ = ОБЩЕЕ_КОЛИЧЕСТВО_НОД/2 + 1
+# node.voting_only: true
+action.auto_create_index: *
