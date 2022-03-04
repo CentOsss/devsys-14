@@ -10,3 +10,4 @@ path.repo: /var/lib/elasticsearch/snapshots
 #:wqxpack.security.transport.ssl.enabled: false
 discovery.seed_hosts: ["172.16.22.179", "172.16.0.200"]
 cluster.initial_master_nodes: ["172.16.22.179"]
+xpack.security.enabled: false
