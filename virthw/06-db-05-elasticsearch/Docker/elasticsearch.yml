@@ -9,3 +9,4 @@ path.repo: /var/lib/elasticsearch/snapshots
 # node.voting_only: true
 xpack.security.transport.ssl.enabled: true
 discovery.seed_hosts: ["172.16.22.179", "172.16.0.200"]
+cluster.initial_master_nodes: ["172.16.22.179"]
