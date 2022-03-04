@@ -1,12 +1,12 @@
 cluster.name: nord
 node.name: ${HOSTNAME}
-node.roles: ["master", "data"]
+#node.roles: ["master", "data"]
 network.host: 0.0.0.0
 path.data: /var/lib/elasticsearch/data
 path.logs: /var/lib/elasticsearch/logs
 path.repo: /var/lib/elasticsearch/snapshots
 # КОЛИЧЕСТВО_КАНДИДАТОВ = ОБЩЕЕ_КОЛИЧЕСТВО_НОД/2 + 1
 # node.voting_only: true
-xpack.security.transport.ssl.enabled: true
+#:wqxpack.security.transport.ssl.enabled: false
 discovery.seed_hosts: ["172.16.22.179", "172.16.0.200"]
 cluster.initial_master_nodes: ["172.16.22.179"]
