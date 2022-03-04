@@ -1,6 +1,6 @@
 cluster.name: nord
 node.name: ${HOSTNAME}
-node.roles: ["master", "data_hot", "data_content"]
+node.roles: ["master", "data"]
 network.host: 0.0.0.0
 path.data: /var/lib/elasticsearch/data
 path.logs: /var/lib/elasticsearch/logs
