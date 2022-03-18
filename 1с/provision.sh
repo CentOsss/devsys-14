@@ -6,11 +6,11 @@
 
 #Install Postgres Pro Standard 14 on Oracle Linux for use with 1c
 # CentOS Linux release 7.9.2009 (Core)
-HOSTNAME=1csrv03
+HOSTNAME=db
 DOMAIN=consalte.ru
-IP=192.168.204.16
-DB_PATH=
-SYS_DISK=/dev/sda1
+IP=192.168.204.12
+DB_PATH=/var/lib/pgpro/1c-14/data
+# SYS_DISK=/dev/sda1
 PASS=bashn3nkiY
 
 echo "Europe/Moscow" > /etc/timezone
@@ -20,16 +20,15 @@ hostname $HOSTNAME.$DOMAIN
 echo "$IP $HOSTNAME $HOSTNAME.$DOMAIN" >> /etc/hosts
 setenforce 0
 sed -i 's/SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config
-systemctl stop firewalld
-systemctl disable firewalld
+systemctl stop firewalld && systemctl disable firewalld
 rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 yum update -y
 yum install -y htop hdparm
 localedef -i ru_RU -f UTF-8 ru_RU.UTF-8
 localectl set-locale LANG=ru_RU.utf8
 # test disk (buffered disk reads > 300MB)
-hdparm -Tt $SYS_DISK > /test.disk.result
-sleep 60
+# hdparm -Tt $SYS_DISK > /test.disk.result
+# sleep 60
 
 # Postgresql
 rpm -i https://repo.postgrespro.ru/pg1c-14/keys/centos.rpm
@@ -51,6 +50,7 @@ echo "listen_addresses = '*' " >> /var/lib/pgpro/1c-14/data/postgresql.conf
 
 sudo -u postgres /opt/pgpro/1c-14/bin/psql -U postgres -c "SELECT pg_reload_conf();"
 #systemctl restart postgrespro-1c-14.service
+# yum install sysstat
 
 
 
