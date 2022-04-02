@@ -1,6 +1,6 @@
 ISO = "bento/ubuntu-20.04"
 NET = "192.168.192."
-DOMAIN = ".netology"
+DOMAIN = ".cloud"
 HOST_PREFIX = "server"
 INVENTORY_PATH = "/etc/ansible/inventory"
 servers = [
@@ -16,14 +16,14 @@ servers = [
 
 
 Vagrant.configure(2) do |config|
- config.vm.synced_folder ".", "/vagrant", disabled: false
+ config.vm.synced_folder ".", "/opt/stack", disabled: false
  servers.each do |machine|
  config.vm.define machine[:hostname] do |node|
  node.vm.box = ISO
  node.vm.hostname = machine[:hostname]
  node.vm.network "private_network", ip: machine[:ip]
  node.vm.network :forwarded_port, guest: machine[:ssh_vm],
-host: machine[:ssh_host]
+ host: machine[:ssh_host]
  node.vm.provider "virtualbox" do |vb|
  vb.customize ["modifyvm", :id, "--memory", machine[:ram]]
  vb.customize ["modifyvm", :id, "--cpus", machine[:core]]

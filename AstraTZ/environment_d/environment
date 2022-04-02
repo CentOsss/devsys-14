@@ -1,0 +1,8 @@
+WSL2:
+vagrant
+ansible
+ export VAGRANT_WSL_ENABLE_WINDOWS_ACCESS="1"
+ export PATH="$PATH:/mnt/c/Program Files/Oracle/VirtualBox"
+ export VAGRANT_WSL_WINDOWS_ACCESS_USER_HOME_PATH="/mnt/c/vagrant"
+ vagrant plugin install virtualbox_WSL2
+ mkdir /mnt/c/vagrant/ $$ cd /mnt/c/vagrant/
