@@ -1,9 +1,9 @@
 <h1>Redmine</h1>
 
-<p>Директория приложения и все необходимы файлы находится на файловой системе хост-машины по пути /sharedock/*. <a href="/projects/retail2/wiki/Резервное_копировани_и_восстановление">Резервные копии</a> хранятся на сервер nasn44 (192.168.204.5) по пути&nbsp;admin@192.168.204.5:/share/CACHEDEV1_DATA/backup/redmine_stack или \\192.168.204.5\backup&nbsp;</p>
+<p>Директория приложения и все необходимы файлы находится на файловой системе хост-машины по пути /sharedock/*. <a href="/projects/retail2/wiki/Резервное_копировани_и_восстановление">Резервные копии</a> хранятся на сервер nasn44  по пути&nbsp;admin@nasn44:/share/CACHEDEV1_DATA/backup/redmine_stack или \\nasn44\backup&nbsp;</p>
 
 <div style="background: rgb(238, 238, 238); border: 1px solid rgb(204, 204, 204); padding: 5px 10px; margin-left: 40px;">
-<p>&nbsp; &nbsp; В качестве&nbsp;ITSM используется веб-приложение Redmine в связке с Oxidized. и GIT.&nbsp;&nbsp;Сервис развернут на виртуальном хосте 192.168.204.4.<br />
+<p>&nbsp; &nbsp; В качестве&nbsp;ITSM используется веб-приложение Redmine в связке с Oxidized. и GIT.&nbsp;&nbsp;Сервис развернут на виртуальном хосте dbit.<br />
 Представляет собой стэк микросервисов на базе docker-контейнеризации.</p>
 
 <p>Состоит из 4&nbsp;контейнеров - базы&nbsp;данных mysql, веб-приложения&nbsp;redmine, системы управления конфигурациями сетевого оборуования oxidiized, системы&nbsp;контроля версий GIT и реверсивного&nbsp;прокси сервера nginx.<br />
