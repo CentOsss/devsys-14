@@ -59,16 +59,41 @@ services:
 
 Используя `psql` создайте БД `test_database`.
 
+```
+postgres=# CREATE DATABASE test_database;
+CREATE DATABASE
+```
+
 Изучите [бэкап БД](https://github.com/netology-code/virt-homeworks/tree/master/06-db-04-postgresql/test_data).
 
 Восстановите бэкап БД в `test_database`.
+
+```
+psql -U postgres -f ./pg_backup.sql test_database
+```
 
 Перейдите в управляющую консоль `psql` внутри контейнера.
 
 Подключитесь к восстановленной БД и проведите операцию ANALYZE для сбора статистики по таблице.
 
+```
+postgres=# \c test_database
+test_database=# ANALYZE VERBOSE public.orders;
+INFO:  analyzing "public.orders"
+INFO:  "orders": scanned 1 of 1 pages, containing 8 live rows and 0 dead rows; 8 rows in sample, 8 estimated total rows
+```
+
 Используя таблицу [pg_stats](https://postgrespro.ru/docs/postgresql/12/view-pg-stats), найдите столбец таблицы `orders` 
 с наибольшим средним значением размера элементов в байтах.
+
+```
+test_database=# select avg_width from pg_stats where tablename='orders';
+ avg_width 
+-----------
+         4
+        16
+         4
+```
 
 **Приведите в ответе** команду, которую вы использовали для вычисления и полученный результат.
 
@@ -80,13 +105,41 @@ services:
 
 Предложите SQL-транзакцию для проведения данной операции.
 
+```
+Т.к. преобразовать существующую таблицу в партиционированную нельзя пересоздадим таблицу:
+test_database=# alter table orders rename to orders_old;
+
+Создадим таблицу указав метод разбиения RANGE по столбцу price:
+test_database=# create table orders (id integer, title varchar(80), price integer) partition by range(price);
+
+И сами секции:
+test_database=# create table orders_less499 partition of orders for values from (0) to (499);
+test_database=# create table orders_more499 partition of orders for values from (499) to (999999999);
+
+Заполним новую таблицу:
+test_database=# insert into orders (id, title, price) select * from orders_old;
+```
+
 Можно ли было изначально исключить "ручное" разбиение при проектировании таблицы orders?
+
+```
+Да, спроектировав таблицу как секционнированную.
+```
 
 ## Задача 4
 
 Используя утилиту `pg_dump` создайте бекап БД `test_database`.
 
+```
+root@node01:/home/centos# docker exec -i postgres_pg_db_1 sh -c 'pg_dump -U postgres  > \
+-d test_database > /var/lib/postgresql/backup/test_database_bckp.sql'
+```
+
 Как бы вы доработали бэкап-файл, чтобы добавить уникальность значения столбца `title` для таблиц `test_database`?
+
+```
+Для уникальности можно добавить индекс
+```
 
 ---
 
