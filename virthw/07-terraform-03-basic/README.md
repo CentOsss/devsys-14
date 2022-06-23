@@ -8,15 +8,51 @@
 1. Создайте s3 бакет, iam роль и пользователя от которого будет работать терраформ. Можно создать отдельного пользователя,
 а можно использовать созданного в рамках предыдущего задания, просто добавьте ему необходимы права, как описано 
 [здесь](https://www.terraform.io/docs/backends/types/s3.html).
-1. Зарегистрируйте бэкэнд в терраформ проекте как описано по ссылке выше. 
 
+1. Зарегистрируйте бэкэнд в терраформ проекте как описано по ссылке выше. 
+```
+terraform {
+  backend "s3" {
+    endpoint                    = "storage.yandexcloud.net"
+    region                      = "ru-central1"
+    bucket                      = "{{ project_environment }}-states"
+    key                         = "{{ project_environment }}.tfstate"
+    access_key                  = "{{ bucket_access_key }}"
+    secret_key                  = "{{ bucket_secret_key }}"
+    skip_region_validation      = "true"
+    skip_credentials_validation = "true"
+  }
+}
+```
 
 ## Задача 2. Инициализируем проект и создаем воркспейсы. 
 
 1. Выполните `terraform init`:
     * если был создан бэкэнд в S3, то терраформ создат файл стейтов в S3 и запись в таблице 
 dynamodb.
-    * иначе будет создан локальный файл со стейтами.  
+    * иначе будет создан локальный файл со стейтами. 
+ ```
+ oshvalev@lt-147477:~/rbta/postgresql-yc/terraform$ terraform init -backend-config=environments/ci/state.name -reconfigure
+
+Initializing the backend...
+
+Successfully configured the backend "s3"! Terraform will automatically
+use this backend unless the backend configuration changes.
+
+Initializing provider plugins...
+- Reusing previous version of terraform-registry.storage.yandexcloud.net/yandex-cloud/yandex from the dependency lock file
+- Using previously-installed terraform-registry.storage.yandexcloud.net/yandex-cloud/yandex v0.72.0
+
+Terraform has been successfully initialized!
+
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.
+ ```
 1. Создайте два воркспейса `stage` и `prod`.
 ```
 terraform workspace new stage
