@@ -18,8 +18,29 @@
 dynamodb.
     * иначе будет создан локальный файл со стейтами.  
 1. Создайте два воркспейса `stage` и `prod`.
-1. В уже созданный `aws_instance` добавьте зависимость типа инстанса от вокспейса, что бы в разных ворскспейсах 
+```
+terraform workspace new stage
+Created and switched to workspace "stage"!
+        
+You're now on a new, empty workspace. Workspaces isolate their state,
+so if you run "terraform plan" Terraform will not see any existing state
+for this configuration.
+
+terraform workspace new prod
+Created and switched to workspace "prod"!
+        
+You're now on a new, empty workspace. Workspaces isolate their state,
+so if you run "terraform plan" Terraform will not see any existing state
+for this configuration.
+
+terraform workspace list
+default
+* prod
+stage
+```
+3. В уже созданный `aws_instance` добавьте зависимость типа инстанса от вокспейса, что бы в разных ворскспейсах 
 использовались разные `instance_type`.
+
 1. Добавим `count`. Для `stage` должен создаться один экземпляр `ec2`, а для `prod` два. 
 1. Создайте рядом еще один `aws_instance`, но теперь определите их количество при помощи `for_each`, а не `count`.
 1. Что бы при изменении типа инстанса не возникло ситуации, когда не будет ни одного инстанса добавьте параметр
